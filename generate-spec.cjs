@@ -144,15 +144,15 @@ body(
 )
 h2('Word Sheet Tab  (e.g. "RU-EN")')
 body('Tab name format: TRANSLATION-STUDY. For RU-EN the user studies English; the translation column holds Russian.')
-body('Row 1 is treated as a header only if A1 = "word" (case-insensitive); otherwise all rows are data.')
+body('Row 1 is treated as a header only if B1 = "word" (case-insensitive); otherwise all rows are data.')
 code([
-  'A  word         -- the word being studied (target language)',
-  'B  translation  -- meaning in the user\'s native language',
-  'C  m1           -- mode 1 repetition count  (0 \u2013 M1_MAX)',
-  'D  m2           -- mode 2 repetition count  (0 \u2013 M2_MAX)',
-  'E  m3           -- mode 3 repetition count  (0 \u2013 M3_MAX)',
-  'F  learned      -- TRUE | FALSE',
-  'G  category     -- optional grouping label (e.g. "Verbs", "Food")',
+  'A  category     -- optional grouping label (e.g. "Verbs", "Food")',
+  'B  word         -- the word being studied (target language)',
+  'C  translation  -- meaning in the user\'s native language',
+  'D  m1           -- mode 1 repetition count  (0 \u2013 M1_MAX)',
+  'E  m2           -- mode 2 repetition count  (0 \u2013 M2_MAX)',
+  'F  m3           -- mode 3 repetition count  (0 \u2013 M3_MAX)',
+  'G  learned      -- TRUE | FALSE',
 ])
 h2('_settings Tab')
 code([
@@ -162,24 +162,24 @@ code([
 h2('Progression Thresholds (constants.js)')
 bullet([
   'M1_MAX = 4   -- word graduates from Mode 1 after 4 correct flip-card views',
-  'M2_MAX = 12  -- word graduates from Mode 2 after 12 correct multiple-choice answers',
-  'M3_MAX = 24  -- word is auto-learned after 24 matching-grid completions',
-  'TOTAL_REPS = 40  -- total repetitions per word across all modes',
+  'M2_MAX = 8   -- word graduates from Mode 2 after 8 correct multiple-choice answers',
+  'M3_MAX = 12  -- word is auto-learned after 12 matching-grid completions',
+  'TOTAL_REPS = 24  -- total repetitions per word across all modes',
 ])
 divider()
 
 // ── 6 ─────────────────────────────────────────────────────────────────────────
 h1('6. Game Mechanics')
 body(
-  'Each session consists of exactly 12 steps. For each step the algorithm randomly selects a mode ' +
-  'from those that currently have eligible words. Counters are accumulated in memory during the session ' +
-  'and batch-saved to Google Sheets after the final step. '
+  'Each session consists of exactly 12 steps. The algorithm pre-plans the session: 4 steps per ' +
+  'available mode (6+6 if 2 modes, 12 if 1 mode), then shuffles the plan so modes are interleaved. ' +
+  'Counters are accumulated in memory during the session and batch-saved to Google Sheets after the final step.'
 )
 h2('Mode Eligibility')
 bullet([
-  'Mode 1 (FlipCard):       m1 < M1_MAX',
-  'Mode 2 (MultipleChoice): m1 \u2265 M1_MAX  AND  m2 < M2_MAX',
-  'Mode 3 (MatchingGrid):   m2 \u2265 M2_MAX  AND  m3 < M3_MAX  AND  \u2265 6 eligible words available',
+  'Mode 1 (FlipCard):       m1 < 4',
+  'Mode 2 (MultipleChoice): m1 \u2265 4  AND  m2 < 8',
+  'Mode 3 (MatchingGrid):   m2 \u2265 8  AND  m3 < 12  AND  \u2265 6 eligible words available',
 ])
 h2('Mode 1 \u2014 FlipCard')
 bullet([
@@ -327,7 +327,7 @@ code([
   '',
   '// Batch update counters after session',
   'POST sheets/v4/spreadsheets/{id}/values:batchUpdate',
-  '  body: { data: [ { range: "{tab}!C{row}:F{row}", values: [[m1,m2,m3,learned]] } ] }',
+  '  body: { data: [ { range: "{tab}!D{row}:G{row}", values: [[m1,m2,m3,learned]] } ] }',
   '',
   '// Write settings',
   'PUT sheets/v4/spreadsheets/{id}/values/_settings!A1:A2',

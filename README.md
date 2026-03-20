@@ -7,10 +7,10 @@ A personal vocabulary learning app built as a **Progressive Web App**. Runs in a
 ## Features
 
 - **Three learning modes** — FlipCard (passive recall) → MultipleChoice (active recall) → MatchingGrid (pairs) — progressively harder as a word advances
-- **Spaced repetition** — each word moves through modes based on repetition counts (4 → 12 → 24); 40 total reps before auto-learned
+- **Spaced repetition** — each word moves through modes based on repetition counts (4 → 8 → 12); 24 total reps before auto-learned
 - **Any language pair** — add a sheet tab named like `RU-EN`, `RU-FI`, or `RU-EL`; the app reads it automatically
-- **Category filter** — tag words in column G, then filter sessions and word list by category
-- **"Learn and forget"** — instantly mark a word as learned and skip it from future sessions
+- **Category filter** — tag words in column A, then filter sessions and word list by category
+- **"Learn and hide"** — instantly mark a word as learned and skip it from future sessions
 - **Cross-device sync** — language selection and category filter saved to the sheet and restored on every login
 - **Word list** — browse all words, toggle learned/active status per word
 - **PWA** — installable on Android and iOS, works as a standalone app with its own icon
@@ -20,8 +20,8 @@ A personal vocabulary learning app built as a **Progressive Web App**. Runs in a
 | Mode | Trigger | Mechanic | Reps to graduate |
 |------|---------|----------|-----------------|
 | 1 — FlipCard | New words (m1 < 4) | Tap to flip; see translation | 4 |
-| 2 — MultipleChoice | After 4 flip-card views | Pick correct translation from 4 options | 12 |
-| 3 — MatchingGrid | After 12 multiple-choice answers | Match 6 word–translation pairs | 24 |
+| 2 — MultipleChoice | After 4 flip-card views | Pick correct translation from 4 options | 8 |
+| 3 — MatchingGrid | After 8 multiple-choice answers | Match 6 word–translation pairs | 12 |
 
 ## Tech Stack
 
@@ -62,10 +62,10 @@ A personal vocabulary learning app built as a **Progressive Web App**. Runs in a
 1. Create a Google Sheet named **Words**
 2. Add a tab named like `RU-EN` (format: `TRANSLATION-STUDY`)
 3. Fill columns:
-   - **A** — word (the language you're studying)
-   - **B** — translation (your native language)
-   - **G** — category (optional; e.g. "Verbs", "Food")
-4. Row 1 can be a header (`word, translation, ...`) or start with data directly
+   - **A** — category (optional grouping; e.g. "Verbs", "Food")
+   - **B** — word (the language you're studying)
+   - **C** — translation (your native language)
+4. Row 1 can be a header or start with data directly — the app auto-detects
 
 ### Local Development
 
@@ -106,13 +106,13 @@ All data lives in the user's **Words** Google Spreadsheet (found or created auto
 
 | Col | Field | Description |
 |-----|-------|-------------|
-| A | word | Target language word |
-| B | translation | Native language meaning |
-| C | m1 | FlipCard repetition count (0–4) |
-| D | m2 | MultipleChoice repetition count (0–12) |
-| E | m3 | MatchingGrid repetition count (0–24) |
-| F | learned | TRUE / FALSE |
-| G | category | Optional grouping label |
+| A | category | Optional grouping label (e.g. "Verbs", "Food") |
+| B | word | Target language word |
+| C | translation | Native language meaning |
+| D | m1 | FlipCard repetition count (0–4) |
+| E | m2 | MultipleChoice repetition count (0–8) |
+| F | m3 | MatchingGrid repetition count (0–12) |
+| G | learned | TRUE / FALSE |
 
 ## Install as Mobile App
 

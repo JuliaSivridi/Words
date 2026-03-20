@@ -65,9 +65,9 @@ export async function getLanguageTabs(sheetId) {
 // Returns array of word objects:
 // { row, word, translation, m1, m2, m3, learned, category }
 // row is 1-based sheet row number.
-// Column G (index 6) is the optional category field.
+// Column layout: A=category, B=word, C=translation, D=m1, E=m2, F=m3, G=learned
 // Handles sheets with or without a header row:
-//   - If row 1 column A is exactly "word" (case-insensitive), treat as header and skip.
+//   - If row 1 column B is exactly "word" (case-insensitive), treat as header and skip.
 //   - Otherwise all non-empty rows are data.
 export async function getWords(sheetId, tab) {
   const range = encodeURIComponent(`${tab}!A1:G`)
@@ -75,7 +75,7 @@ export async function getWords(sheetId, tab) {
   const rows = data.values ?? []
 
   const hasHeader = rows.length > 0 &&
-    rows[0][0]?.toString().trim().toLowerCase() === 'word'
+    rows[0][1]?.toString().trim().toLowerCase() === 'word'
 
   const dataRows = hasHeader ? rows.slice(1) : rows
   const rowOffset = hasHeader ? 2 : 1
@@ -86,13 +86,13 @@ export async function getWords(sheetId, tab) {
   return dataRows
     .map((r, i) => ({
       row: rowOffset + i,
-      word: r[0]?.trim() ?? '',
-      translation: r[1]?.trim() ?? '',
-      m1: parseInt(r[2]) || 0,
-      m2: parseInt(r[3]) || 0,
-      m3: parseInt(r[4]) || 0,
-      learned: r[5] === 'TRUE' || r[5] === true,
-      category: r[6]?.trim() ?? '',
+      category: r[0]?.trim() ?? '',
+      word: r[1]?.trim() ?? '',
+      translation: r[2]?.trim() ?? '',
+      m1: parseInt(r[3]) || 0,
+      m2: parseInt(r[4]) || 0,
+      m3: parseInt(r[5]) || 0,
+      learned: r[6] === 'TRUE' || r[6] === true,
     }))
     .filter(w => w.word)
 }
@@ -104,7 +104,7 @@ export async function batchUpdateWords(sheetId, tab, updates) {
   if (!updates.length) return
 
   const data = updates.map(u => ({
-    range: `${tab}!C${u.row}:F${u.row}`,
+    range: `${tab}!D${u.row}:G${u.row}`,
     values: [[u.m1, u.m2, u.m3, u.learned ? 'TRUE' : 'FALSE']],
   }))
 
@@ -117,7 +117,7 @@ export async function batchUpdateWords(sheetId, tab, updates) {
 // ─── Sheets: mark single word learned immediately ───────────────────────────
 
 export async function markLearned(sheetId, tab, row, learned) {
-  const range = encodeURIComponent(`${tab}!F${row}`)
+  const range = encodeURIComponent(`${tab}!G${row}`)
   await request(`${SHEETS_BASE}/${sheetId}/values/${range}?valueInputOption=RAW`, {
     method: 'PUT',
     body: JSON.stringify({ values: [[learned ? 'TRUE' : 'FALSE']] }),
@@ -127,7 +127,7 @@ export async function markLearned(sheetId, tab, row, learned) {
 // ─── Sheets: reset word counters (un-learn) ──────────────────────────────────
 
 export async function resetWordCounters(sheetId, tab, row) {
-  const range = encodeURIComponent(`${tab}!C${row}:F${row}`)
+  const range = encodeURIComponent(`${tab}!D${row}:G${row}`)
   await request(`${SHEETS_BASE}/${sheetId}/values/${range}?valueInputOption=RAW`, {
     method: 'PUT',
     body: JSON.stringify({ values: [[0, 0, 0, 'FALSE']] }),
