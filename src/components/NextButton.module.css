@@ -1,0 +1,10 @@
+.wrapper {
+  padding: 12px 16px 24px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+.btn {
+  font-size: 1.0625rem;
+  padding: 16px;
+}
