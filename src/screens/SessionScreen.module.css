@@ -72,7 +72,9 @@
 }
 
 .completeIcon {
-  font-size: 4rem;
+  color: var(--accent);
+  display: flex;
+  justify-content: center;
   line-height: 1;
 }
 

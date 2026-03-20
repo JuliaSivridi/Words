@@ -24,7 +24,7 @@ export default function LoginScreen({ onLogin }) {
       <div className={styles.content}>
         {/* Horizontal logo row: icon left, name+tagline right */}
         <div className={styles.logoRow}>
-          <span className={styles.logoIcon}>📖</span>
+          <img src="/icons/icon-192.png" alt="Words" className={styles.logoIcon} />
           <div className={styles.logoTexts}>
             <h1 className={styles.logoText}>Words</h1>
             <p className={styles.tagline}>Learn vocabulary with flashcards</p>

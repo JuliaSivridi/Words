@@ -5,6 +5,7 @@ import { M1_MAX, M2_MAX, M3_MAX } from '../constants.js'
 import FlipCard from '../components/FlipCard.jsx'
 import MultipleChoice from '../components/MultipleChoice.jsx'
 import MatchingGrid from '../components/MatchingGrid.jsx'
+import CheckIcon from '../components/CheckIcon.jsx'
 import styles from './SessionScreen.module.css'
 
 const TOTAL_STEPS = 12
@@ -122,7 +123,7 @@ export default function SessionScreen({ sheetId, tab, words, categoryFilter, onS
     return (
       <div className={styles.screen}>
         <div className={styles.centered}>
-          <div className={styles.completeIcon}>✓</div>
+          <div className={styles.completeIcon}><CheckIcon size={64} /></div>
           <h2 className={styles.completeTitle}>Session complete!</h2>
           <p className={styles.completeSub}>Great job! Keep practising.</p>
           <button className="btn btn-primary" onClick={() => navigate('/')}>

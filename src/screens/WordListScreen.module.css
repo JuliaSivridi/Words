@@ -110,6 +110,13 @@
   flex-shrink: 0;
   min-width: 48px;
   text-align: right;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.progressCheck {
+  color: var(--accent);
 }
 
 .eyeBtn {

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getLanguageTabs } from '../sheetsApi.js'
 import { parseLangLabel } from '../langMap.js'
+import CheckIcon from '../components/CheckIcon.jsx'
 import styles from './LanguageScreen.module.css'
 
 export default function LanguageScreen({ sheetId, currentLang, onSelect }) {
@@ -55,7 +56,7 @@ export default function LanguageScreen({ sheetId, currentLang, onSelect }) {
             >
               <span className={styles.tabName}>{formatTabName(tab)}</span>
               <span className={styles.tabCode}>{tab}</span>
-              {tab === currentLang && <span className={styles.check}>✓</span>}
+              {tab === currentLang && <span className={styles.check}><CheckIcon /></span>}
             </button>
           ))}
         </div>

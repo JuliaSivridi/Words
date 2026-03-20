@@ -44,8 +44,8 @@
 
 .check {
   color: var(--accent);
-  font-weight: 700;
-  font-size: 1.125rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 .empty {

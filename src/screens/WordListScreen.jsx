@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { TOTAL_REPS } from '../constants.js'
+import CheckIcon from '../components/CheckIcon.jsx'
 import styles from './WordListScreen.module.css'
 
 // categoryFilter: null = show all; string = show only words in that category
@@ -72,8 +73,8 @@ function WordItem({ word, onToggle }) {
         <span className={styles.translationText}>{word.translation}</span>
       </div>
 
-      <span className={styles.progress} title="Repetitions done / total">
-        {isLearned ? '✓' : `${progress}\u200A/\u200A${TOTAL_REPS}`}
+      <span className={`${styles.progress} ${isLearned ? styles.progressCheck : ''}`} title="Repetitions done / total">
+        {isLearned ? <CheckIcon size={18} /> : `${progress}\u200A/\u200A${TOTAL_REPS}`}
       </span>
 
       <button

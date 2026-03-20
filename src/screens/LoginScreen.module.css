@@ -23,9 +23,11 @@
 }
 
 .logoIcon {
-  font-size: 3.5rem;
-  line-height: 1;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
   flex-shrink: 0;
+  display: block;
 }
 
 .logoTexts {
