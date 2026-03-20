@@ -37,7 +37,7 @@ export default function MultipleChoice({ step, onNext, onLearn }) {
             onClick={() => { setMarkedLearned(true); onLearn() }}
             disabled={markedLearned}
           >
-            {markedLearned ? 'Learned ✓' : 'Learn and forget'}
+            {markedLearned ? 'Learned ✓' : 'Learn and hide'}
           </button>
         </div>
         <div className={styles.wordCard}>

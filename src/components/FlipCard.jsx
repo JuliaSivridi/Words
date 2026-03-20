@@ -6,7 +6,7 @@ export default function FlipCard({ step, onNext, onLearn }) {
   const [flipped, setFlipped] = useState(false)
   // hasFlipped: Next becomes available once the user has seen the back side
   const [hasFlipped, setHasFlipped] = useState(false)
-  // markedLearned: tracks if the user clicked "Learn and forget" this step
+  // markedLearned: tracks if the user clicked "Learn and hide" this step
   const [markedLearned, setMarkedLearned] = useState(false)
   const touchStartY = useRef(null)
 
@@ -34,7 +34,7 @@ export default function FlipCard({ step, onNext, onLearn }) {
           onClick={() => { setMarkedLearned(true); onLearn() }}
           disabled={markedLearned}
         >
-          {markedLearned ? 'Learned ✓' : 'Learn and forget'}
+          {markedLearned ? 'Learned ✓' : 'Learn and hide'}
         </button>
       </div>
 
