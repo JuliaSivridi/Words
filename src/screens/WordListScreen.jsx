@@ -27,7 +27,9 @@ export default function WordListScreen({ words, loading, categoryFilter, onToggl
             </span>
           )}
         </div>
-        <span className={styles.count}>{visibleWords.length}</span>
+        <span className={styles.count}>
+          {visibleWords.filter(w => w.learned).length}&thinsp;/&thinsp;{visibleWords.length}
+        </span>
       </div>
 
       <div className={styles.list}>

@@ -46,9 +46,10 @@
 .count {
   font-size: 0.9375rem;
   color: var(--text-muted);
-  min-width: 32px;
+  min-width: 56px;
   text-align: right;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* Scrollable word list */
