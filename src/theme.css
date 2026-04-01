@@ -22,7 +22,7 @@ body {
 
 :root {
   --bg: #FFFFFF;
-  --surface: #F4F4F4;
+  --surface: #F3F1EF;
   --surface-2: #E8E8E8;
   --text: #1C1C1C;
   --text-muted: #6B6B6B;
@@ -31,7 +31,7 @@ body {
   --accent-text: #FFFFFF;
   --success: #6BBF7A;
   --error: #E07070;
-  --border: #D0D0D0;
+  --border: #E0E0E0;
   --card-bg: #FFFFFF;
   --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   --radius: 14px;
@@ -40,13 +40,13 @@ body {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #2B2B2B;
+    --bg: #1C1C1C;
     --surface: #363636;
     --surface-2: #424242;
     --text: #EFEFEF;
-    --text-muted: #A0A0A0;
-    --accent: #E07E38;
-    --accent-hover: #C96E2F;
+    --text-muted: #949494;
+    --accent: #E8935A;
+    --accent-hover: #D4804A;
     --accent-text: #FFFFFF;
     --success: #5AA569;
     --error: #C96060;
