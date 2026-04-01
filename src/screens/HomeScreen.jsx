@@ -25,7 +25,7 @@ export default function HomeScreen({ sheetId, currentLang, currentCategory, onSi
   }
 
   return (
-    <div className="screen">
+    <div className={styles.screen}>
       <div className={styles.topBar}>
         <span className={styles.appName}>Words</span>
         <button className={styles.userBtn} onClick={handleSignOut} title="Sign out">

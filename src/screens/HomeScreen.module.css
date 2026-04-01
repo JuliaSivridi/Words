@@ -1,3 +1,11 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+}
+
 .topBar {
   display: flex;
   align-items: center;
@@ -48,6 +56,7 @@
 .content {
   justify-content: center;
   gap: 24px;
+  overflow-y: auto;
 }
 
 .buttons {
