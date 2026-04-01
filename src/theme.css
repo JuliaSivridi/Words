@@ -26,8 +26,8 @@ body {
   --surface-2: #E8E8E8;
   --text: #1C1C1C;
   --text-muted: #6B6B6B;
-  --accent: #E8935A;
-  --accent-hover: #D4804A;
+  --accent: #E07E38;
+  --accent-hover: #C96E2F;
   --accent-text: #FFFFFF;
   --success: #6BBF7A;
   --error: #E07070;
@@ -45,8 +45,8 @@ body {
     --surface-2: #424242;
     --text: #EFEFEF;
     --text-muted: #A0A0A0;
-    --accent: #D4804A;
-    --accent-hover: #BF7040;
+    --accent: #E07E38;
+    --accent-hover: #C96E2F;
     --accent-text: #FFFFFF;
     --success: #5AA569;
     --error: #C96060;
