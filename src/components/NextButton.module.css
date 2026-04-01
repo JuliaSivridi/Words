@@ -3,8 +3,7 @@
   background: var(--bg);
   border-top: 1px solid var(--border);
   flex-shrink: 0;
-  position: sticky;
-  bottom: 0;
+  margin-top: auto;
 }
 
 .btn {
