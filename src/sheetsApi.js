@@ -22,7 +22,9 @@ async function request(url, options = {}) {
   return res.json()
 }
 
-// ─── Drive: find or create "Words" spreadsheet ─────────────────────────────
+// ─── Drive: find or create "db_words" spreadsheet ───────────────────────────
+
+const DB_FILE_NAME = 'db_words'
 
 export async function findOrCreateWordsFile() {
   const cached = localStorage.getItem('words_sheet_id')
@@ -30,7 +32,7 @@ export async function findOrCreateWordsFile() {
 
   // Search for existing file
   const query = encodeURIComponent(
-    "name='Words' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false"
+    `name='${DB_FILE_NAME}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`
   )
   const list = await request(`${DRIVE_BASE}/files?q=${query}&fields=files(id,name)`)
 
@@ -44,7 +46,7 @@ export async function findOrCreateWordsFile() {
   const created = await request(SHEETS_BASE, {
     method: 'POST',
     body: JSON.stringify({
-      properties: { title: 'Words' },
+      properties: { title: DB_FILE_NAME },
     }),
   })
   localStorage.setItem('words_sheet_id', created.spreadsheetId)
