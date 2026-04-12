@@ -59,7 +59,7 @@ A personal vocabulary learning app built as a **Progressive Web App**. Runs in a
 
 ### Prepare your Google Sheet
 
-1. Create a Google Sheet named **Words**
+1. Create a Google Sheet named **db_words**
 2. Add a tab named like `RU-EN` (format: `TRANSLATION-STUDY`)
 3. Fill columns:
    - **A** — category (optional grouping; e.g. "Verbs", "Food")
@@ -95,7 +95,7 @@ npm run build  # production build → dist/
 
 ## Data Model
 
-All data lives in the user's **Words** Google Spreadsheet (found or created automatically on first login).
+All data lives in the user's **db_words** Google Spreadsheet (found or created automatically on first login).
 
 | Sheet | Purpose |
 |---|---|
