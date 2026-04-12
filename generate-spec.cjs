@@ -2,7 +2,7 @@ const PDFDocument = require('pdfkit')
 const fs = require('fs')
 
 const doc = new PDFDocument({ margin: 60, size: 'A4' })
-doc.pipe(fs.createWriteStream('D:/Projects/Words/docs/Words_TechSpec.pdf'))
+doc.pipe(fs.createWriteStream('docs/Words_TechSpec.pdf'))
 
 const ORANGE = '#e07e38'
 const DARK   = '#1c1c1c'
@@ -19,11 +19,6 @@ function h2(text) {
   doc.moveDown(0.5)
   doc.fontSize(13).fillColor(DARK).font('Helvetica-Bold').text(text)
   doc.moveDown(0.15)
-}
-function h3(text) {
-  doc.moveDown(0.3)
-  doc.fontSize(10).fillColor(ORANGE).font('Helvetica-Bold').text(text)
-  doc.moveDown(0.1)
 }
 function body(text) {
   doc.fontSize(10).fillColor(DARK).font('Helvetica').text(text, { align: 'justify' })
@@ -51,398 +46,309 @@ function divider() {
   doc.moveDown(0.4)
 }
 
-// ── Cover ──────────────────────────────────────────────────────────────────────
+// Cover
 doc.rect(0, 0, 595, 190).fillColor(DARK).fill()
 doc.fontSize(30).fillColor(ORANGE).font('Helvetica-Bold').text('Words', 60, 55)
 doc.fontSize(15).fillColor('#ffffff').font('Helvetica').text('Technical Specification', 60, 98)
 doc.fontSize(9.5).fillColor(LGRAY).text('Personal PWA  \u00b7  Web + Mobile  \u00b7  Version 1.0', 60, 126)
-doc.fontSize(9).fillColor(LGRAY).text('March 2026', 60, 144)
+doc.fontSize(9).fillColor(LGRAY).text('April 2026', 60, 144)
 doc.y = 215
 
-// ── 1 ─────────────────────────────────────────────────────────────────────────
 h1('1. Project Overview')
 body(
-  'Words is a personal vocabulary learning application built as a Progressive Web App (PWA). ' +
-  'It runs in any modern browser and can be installed on Android or iOS home screens for a native-like ' +
-  'experience without an app store. The application uses Google Sheets as a persistent database and ' +
-  'Google Identity Services for authentication. Words are learned through three progressively harder ' +
-  'exercise modes: flip cards, multiple-choice questions, and a matching grid. ' +
-  'There is no backend — all data access is performed directly from the browser via the Google Sheets API v4.'
+  'Words is a personal vocabulary learning app built as a Progressive Web App (PWA). ' +
+  'It runs in any modern browser and installs on Android or iOS home screens as a standalone app. ' +
+  'There is no backend \u2014 Google Sheets is used directly as the database via the Sheets API v4. ' +
+  'Authentication is handled client-side through Google Identity Services (OAuth 2.0). ' +
+  'The app supports any language pair and organises words into three progressively harder learning modes ' +
+  'based on a simple spaced-repetition model.'
 )
 divider()
 
-// ── 2 ─────────────────────────────────────────────────────────────────────────
-h1('2. Goals & Non-Goals')
-h2('Goals')
-bullet([
-  'Vocabulary learning tool accessible from any device via browser or installed PWA',
-  'No backend server required — Google Sheets acts as the data store',
-  'Three-mode spaced-repetition system: FlipCard → MultipleChoice → MatchingGrid',
-  'Single user (personal use); authentication via Google OAuth 2.0',
-  'Settings (language, category filter) synced across devices via the sheet',
-  'Mobile-first design with full touch support and swipe gestures',
-])
-h2('Non-Goals')
-bullet([
-  'Multi-user collaboration or shared word lists',
-  'Native app distribution via App Store / Google Play',
-  'Server-side rendering or a backend API',
-  'Built-in offline mode / IndexedDB caching (network required)',
-  'Audio pronunciation or TTS',
-])
-divider()
-
-// ── 3 ─────────────────────────────────────────────────────────────────────────
-h1('3. Technology Stack')
+h1('2. Technology Stack')
 h2('Frontend')
 kv('Framework', 'React 18 (JavaScript, no TypeScript)')
 kv('Build Tool', 'Vite 6')
-kv('Styling', 'CSS Modules + global CSS variables (light / dark theme)')
+kv('Styling', 'CSS Modules + CSS custom properties (light / dark theme)')
 kv('Routing', 'React Router DOM v6')
-kv('PWA', 'Manual manifest.json + service worker (sw.js)')
+kv('Icons', 'Inline SVG (Lucide-style, hand-written)')
 doc.moveDown(0.3)
 h2('Data & Auth')
 kv('Database', 'Google Sheets API v4 (spreadsheet as DB, direct browser fetch)')
-kv('Drive API', 'Google Drive API v3 (find or create the "Words" spreadsheet)')
+kv('File Discovery', 'Google Drive API v3 (find or create "db_words" spreadsheet)')
 kv('Authentication', 'Google Identity Services (GIS) \u2014 OAuth 2.0 Token Client')
-kv('Offline Storage', 'None (localStorage for lang + category preferences only)')
+kv('Token Storage', 'In-memory access token; user profile in localStorage')
 doc.moveDown(0.3)
 h2('PWA & Deployment')
+kv('PWA', 'manifest.json + custom service worker (sw.js)')
 kv('Hosting', 'Any static host (Vercel, Netlify, GitHub Pages)')
-kv('CI/CD', 'GitHub \u2192 Vercel (push-triggered builds)')
-kv('Env variable', 'VITE_GOOGLE_CLIENT_ID (single variable required)')
+kv('Single env var', 'VITE_GOOGLE_CLIENT_ID')
 divider()
 
-// ── 4 ─────────────────────────────────────────────────────────────────────────
-h1('4. Application Architecture')
-body('The app is a single-page React application with no backend. State flows top-down from App.jsx. ' +
-  'All Google API calls are made directly from the browser using a short-lived OAuth 2.0 access token.')
-h3('Layer Overview')
-bullet([
-  'App.jsx  --  root router, auth state, sheet ID, language & category state',
-  'screens/  --  LoginScreen, HomeScreen, SessionScreen, WordListScreen, LanguageScreen, CategoryScreen',
-  'components/  --  FlipCard, MultipleChoice, MatchingGrid, WordListItem, NextButton',
-  'hooks/useWords.js  --  load words, saveSessionUpdates, setLearned, resetWord',
-  'hooks/useSession.js  --  buildSession() constructs the 12-step session array',
-  'auth.js  --  GIS token client, trySilentSignIn(), onAuthChange()',
-  'sheetsApi.js  --  Drive + Sheets API fetch wrappers',
-  'constants.js  --  M1_MAX=4, M2_MAX=12, M3_MAX=24, TOTAL_REPS=40',
-])
-h3('Data Flow')
-body('Login \u2192 findOrCreateWordsFile() \u2192 readSettings() \u2192 load words for selected tab \u2192 buildSession() \u2192 ' +
-  'render steps \u2192 collect updates in memory \u2192 batchUpdateWords() after session complete')
-h3('Settings Sync')
-body('Language and category filter are stored in two places: localStorage (fast initial load) and ' +
-  'the _settings tab of the Words sheet (cross-device sync). On login, sheet values win.')
-divider()
-
-// ── 5 ─────────────────────────────────────────────────────────────────────────
-h1('5. Data Model')
-body(
-  'All data lives in the user\'s Google Spreadsheet named "Words". The app finds it in Google Drive ' +
-  'by name and creates it automatically on first launch. Each language pair is a separate sheet tab.'
-)
-h2('Word Sheet Tab  (e.g. "RU-EN")')
-body('Tab name format: TRANSLATION-STUDY. For RU-EN the user studies English; the translation column holds Russian.')
-body('Row 1 is treated as a header only if B1 = "word" (case-insensitive); otherwise all rows are data.')
+h1('3. Project Structure')
 code([
-  'A  category     -- optional grouping label (e.g. "Verbs", "Food")',
-  'B  word         -- the word being studied (target language)',
-  'C  translation  -- meaning in the user\'s native language',
-  'D  m1           -- mode 1 repetition count  (0 \u2013 M1_MAX)',
-  'E  m2           -- mode 2 repetition count  (0 \u2013 M2_MAX)',
-  'F  m3           -- mode 3 repetition count  (0 \u2013 M3_MAX)',
-  'G  learned      -- TRUE | FALSE',
+  'src/',
+  '  main.jsx               Entry point',
+  '  App.jsx                Router + top-level state (auth, sheet, language)',
+  '  theme.css              CSS variables, light/dark theme, min 16px font',
+  '  auth.js                GIS token client, silent sign-in, token refresh',
+  '  sheetsApi.js           Drive + Sheets API wrappers',
+  '  constants.js           M1_MAX, M2_MAX, M3_MAX, TOTAL_REPS',
+  '  screens/',
+  '    LoginScreen.jsx      Sign-in page',
+  '    HomeScreen.jsx       Start / Word List / Language buttons',
+  '    LanguageScreen.jsx   Tab picker from db_words spreadsheet',
+  '    CategoryScreen.jsx   Category filter picker',
+  '    SessionScreen.jsx    12-step session orchestrator',
+  '    WordListScreen.jsx   Browseable word list with learned toggle',
+  '  components/',
+  '    FlipCard.jsx         Mode 1 -- flip card',
+  '    MultipleChoice.jsx   Mode 2 -- 4-option quiz',
+  '    MatchingGrid.jsx     Mode 3 -- 6-pair matching grid',
+  '    NextButton.jsx       Shared sticky Next button',
+  '    CheckIcon.jsx        Shared SVG checkmark (Lucide-style)',
+  '    WordListItem.jsx     Single row in word list',
+  '  hooks/',
+  '    useWords.js          Word loading + saving hook',
+  '    useSession.js        buildSession() -- 12-step plan',
+  'public/',
+  '  manifest.json          PWA manifest',
+  '  sw.js                  Service worker (cache + network-first)',
+  '  icons/                 icon-192.png, icon-512.png, favicon.svg',
 ])
+divider()
+
+h1('4. Data Model')
+body(
+  'All data lives in the user\'s Google Spreadsheet named "db_words" (found or auto-created on first login). ' +
+  'Language tabs are named in TRANSLATION-STUDY format (e.g. "RU-EN" = study English, translate Russian). ' +
+  'A special "_settings" tab stores the last selected language and category for cross-device sync.'
+)
+h2('Word Tab Columns')
+code([
+  'A  category     Optional grouping label (e.g. "Verbs", "Food")',
+  'B  word         Target-language word (the language being studied)',
+  'C  translation  Native-language meaning',
+  'D  m1           FlipCard repetition count     (0 \u2013 M1_MAX)',
+  'E  m2           MultipleChoice rep count      (0 \u2013 M2_MAX)',
+  'F  m3           MatchingGrid rep count        (0 \u2013 M3_MAX)',
+  'G  learned      TRUE / FALSE',
+])
+h2('Repetition Constants (src/constants.js)')
+kv('M1_MAX', '4   -- reps in FlipCard before advancing to MultipleChoice')
+kv('M2_MAX', '8   -- reps in MultipleChoice before advancing to MatchingGrid')
+kv('M3_MAX', '12  -- reps in MatchingGrid before auto-marked learned')
+kv('TOTAL_REPS', '24  -- total reps across all modes (4 + 8 + 12)')
+doc.moveDown(0.3)
 h2('_settings Tab')
-code([
-  'A1  language code   -- e.g. "RU-EN"  (last selected tab)',
-  'A2  category filter -- comma-separated category names, or "" = all',
-])
-h2('Progression Thresholds (constants.js)')
-bullet([
-  'M1_MAX = 4   -- word graduates from Mode 1 after 4 correct flip-card views',
-  'M2_MAX = 8   -- word graduates from Mode 2 after 8 correct multiple-choice answers',
-  'M3_MAX = 12  -- word is auto-learned after 12 matching-grid completions',
-  'TOTAL_REPS = 24  -- total repetitions per word across all modes',
-])
-divider()
-
-// ── 6 ─────────────────────────────────────────────────────────────────────────
-h1('6. Game Mechanics')
+kv('A1', 'Language code, e.g. "RU-EN"')
+kv('A2', 'Category filter, e.g. "Animals" (empty = all categories)')
+body('Created automatically by ensureSettingsTab() on first write. Read on login to restore selection.')
+h2('Header Detection')
 body(
-  'Each session consists of exactly 12 steps. The algorithm pre-plans the session: 4 steps per ' +
-  'available mode (6+6 if 2 modes, 12 if 1 mode), then shuffles the plan so modes are interleaved. ' +
-  'Counters are accumulated in memory during the session and batch-saved to Google Sheets after the final step.'
+  'Row 1 is treated as a header and skipped if column B contains exactly "word" (case-insensitive). ' +
+  'Otherwise all non-empty rows are treated as data, allowing sheets with or without a header row.'
 )
-h2('Mode Eligibility')
+divider()
+
+h1('5. Session Algorithm')
+body(
+  'Each session consists of 12 steps. The algorithm selects words from mode-specific pools and builds a ' +
+  'balanced step plan before the session starts.'
+)
+h2('Pool Building')
 bullet([
-  'Mode 1 (FlipCard):       m1 < 4',
-  'Mode 2 (MultipleChoice): m1 \u2265 4  AND  m2 < 8',
-  'Mode 3 (MatchingGrid):   m2 \u2265 8  AND  m3 < 12  AND  \u2265 6 eligible words available',
+  'Mode 1 pool: words where !learned && m1 < M1_MAX',
+  'Mode 2 pool: words where !learned && m1 >= M1_MAX && m2 < M2_MAX',
+  'Mode 3 pool: words where !learned && m2 >= M2_MAX && m3 < M3_MAX, sorted ascending by m3',
+  'Mode 3 requires at least 6 words in pool; otherwise mode 3 is excluded',
+  'If no modes available, session returns { steps: [], allLearned: true }',
 ])
-h2('Mode 1 \u2014 FlipCard')
+h2('Step Planning')
 bullet([
-  'Displays one word at a time on a full-screen flip card',
-  'Front face shows the word; back face shows the translation',
-  'CSS 3D flip on the X-axis (vertical flip); trigger: click / tap / vertical swipe (delta Y > 50px)',
-  'Next \u2192 button becomes active after the card is flipped OR after "Learn and forget" is clicked',
-  'On Next: m1++ for this word (saved at end of session)',
+  'Steps distributed equally: 12 / N modes (e.g. 4+4+4, 6+6, or 12)',
+  'Step list is shuffled so modes are interleaved rather than grouped',
+  'Modes 1 & 2: shuffled word queue, cycling through all pool words',
+  'Mode 3: pool split into non-overlapping groups of 6; each step uses next group (cycling)',
 ])
-h2('Mode 2 \u2014 MultipleChoice')
+h2('Counter Updates')
 bullet([
-  'Shows the word in the top half; 2\u00d72 grid of translation cards in the bottom half',
-  'Wrong tap: card flashes red, question remains active',
-  'Correct tap: card turns green, Next \u2192 becomes active',
-  'Next \u2192 also becomes active if "Learn and forget" is clicked',
-  'Wrong answers drawn from the same category-filtered word pool when possible (falls back to full list)',
-  'On Next: m2++ for this word',
-])
-h2('Mode 3 \u2014 MatchingGrid')
-bullet([
-  '6 words selected via round-robin across all selected categories (pickSpread)',
-  'Two columns: left = shuffled words, right = shuffled translations (same 6 rows, independent order)',
-  'Tap any card in either column to select it; tap the opposite column to attempt a match',
-  'Correct pair: both cards turn green and are permanently deactivated',
-  'Wrong pair: both flash red, selection resets',
-  'All 6 pairs matched \u2192 Next \u2192 becomes active',
-  'No "Learn and forget" button in Mode 3',
-  'On Next: m3++ for all 6 words in the group',
-])
-h2('Category Filter & Pool Building')
-bullet([
-  'sessionCategory: null = all words; string[] = only words in selected categories',
-  'buildMode3Pool(): uses strictly qualified words (m2 \u2265 M2_MAX) as primary pool',
-  'If selected categories are missing from the qualified pool, supplements with the most-advanced',
-  '  (by m1+m2 score) unlearned words from those categories to ensure cross-category representation',
-  'Shuffled queues for modes 1 & 2: all words cycled before any word repeats',
-])
-h2('"Learn and forget" Button')
-bullet([
-  'Available in Mode 1 and Mode 2 on every step',
-  'Clicking immediately marks the word as learned=TRUE and saves to the sheet',
-  'Also unlocks the Next \u2192 button so the session can continue',
-  'Once clicked, the button is disabled for the current step (shows "Learned \u2713")',
+  'Counters accumulate locally during session -- no API calls mid-session',
+  'On session complete: batchUpdateWords() sends all changed rows in one Sheets API call',
+  '"Learn and hide" button: markLearned() fires immediately as a separate PUT request',
 ])
 divider()
 
-// ── 7 ─────────────────────────────────────────────────────────────────────────
-h1('7. Screens & Navigation')
+h1('6. Screens & Navigation')
 h2('LoginScreen')
 bullet([
-  'Centered layout: horizontal logo row (icon + app name + tagline)',
-  'Two description lines: "Data stored in your Google Sheets." / "Works offline with automatic sync."',
-  'Orange "Sign in with Google" button with Google logo SVG',
+  'App icon (icon-192.png) + app name centred on screen',
+  '"Sign in with Google" button triggers GIS token request',
+  'trySilentSignIn() called on load -- auto-navigates to Home if token obtained',
 ])
 h2('HomeScreen')
 bullet([
-  'Four navigation buttons in order: Start \u2192 Language \u2192 Category \u2192 Word List',
-  'Language and Category buttons show a sub-label (selected value or "All categories")',
-  'Category sub-label: null \u2192 "All categories" | one item \u2192 name | 2+ \u2192 "Multiple\u2026"',
-  'Monochrome SVG icons (currentColor) aligned left on each button',
-  'Sign-out available via user avatar or menu',
+  'Three full-width buttons: Start session / Word List / Language',
+  'Subtitle shows current language code and category filter',
 ])
 h2('LanguageScreen')
 bullet([
-  'Lists all sheet tabs from the "Words" file (excludes _settings)',
-  'Currently selected tab has accent-colored checkmark on the right',
-  'Tapping a tab saves to localStorage + sheet settings and returns to Home',
+  'Lists all sheet tabs from db_words (filters out Sheet1 and system tabs)',
+  'Checkmark on currently selected language; tap to select and return to Home',
 ])
 h2('CategoryScreen')
 bullet([
-  'Multi-select: any combination of categories can be active simultaneously',
-  '"All categories" row at top — toggles between full selection and empty selection',
-  'Each category row shows a checkmark on the right when selected',
-  'Back button saves the selection and navigates to Home (no separate Done button)',
-  'Stored as null (all) or string[] in state; synced to sheet as comma-separated string',
+  'Lists all unique values from column A of the current language tab',
+  '"All categories" option at top; checkmark on active selection',
 ])
 h2('SessionScreen')
 bullet([
-  'Progress indicator at top: "3 / 12"',
-  'Renders FlipCard / MultipleChoice / MatchingGrid based on current step mode',
-  'Next \u2192 button always at the bottom, disabled until the step is complete',
-  'After step 12: calls batchUpdateWords(), shows "\u2713 Session complete!" banner, returns to Home',
+  'Progress bar + step counter ("3 / 12") in top bar; back button exits without saving',
+  'Renders FlipCard, MultipleChoice, or MatchingGrid based on step type',
+  '"Next \u2192" button always visible at bottom (disabled until step completed)',
+  'After step 12: saves counters, shows "Session complete!" screen',
 ])
 h2('WordListScreen')
 bullet([
-  'Scrollable list of all words (filtered by sessionCategory if set)',
-  'Each row: word | translation | toggle icon',
-  'Icon: eye-open = active; eye-crossed = learned',
-  'Tapping eye-crossed \u2192 resets word (learned=FALSE, all counters \u2192 0), saved immediately',
-  'Tapping eye-open \u2192 marks learned=TRUE, saved immediately',
+  'Counter: "N learned / M total" in header',
+  'Each row: word, translation, eye/crossed-eye icon',
+  'Tap icon: toggles learned; un-learning resets all counters to 0 (immediate API write)',
 ])
 divider()
 
-// ── 8 ─────────────────────────────────────────────────────────────────────────
-h1('8. Authentication')
-body(
-  'Authentication uses Google Identity Services (GIS) Token Client \u2014 OAuth 2.0 implicit flow. ' +
-  'No redirect URIs are needed; only Authorized JavaScript Origins must be configured.'
-)
+h1('7. Learning Modes')
+h2('Mode 1 -- FlipCard')
 bullet([
-  'initAuth(): loads the GIS script, then calls trySilentSignIn()',
-  'trySilentSignIn(): calls tokenClient.requestAccessToken({ prompt: "" })',
-  '  -- silent: no UI shown if the user previously granted access',
-  '  -- falls back to LoginScreen popup if silent fails',
-  'User profile (name, email, picture) fetched from Google userinfo endpoint',
-  'Email saved in localStorage as hint for subsequent silent sign-ins',
-  'Access token stored in module-level memory variable (not persisted)',
-  'On 401 from Sheets API: silent token refresh attempted automatically',
-  'Sign-out: clears user object, calls google.accounts.oauth2.revoke()',
+  'Full-screen card: front = word, back = translation',
+  'CSS 3D flip on X-axis (vertical rotation)',
+  'Triggers: tap / click / vertical swipe (\u0394Y > 50px)',
+  '"Learn and hide" button fires markLearned() immediately',
+  'After flip: Next becomes active; on advance: m1++ locally',
+])
+h2('Mode 2 -- MultipleChoice')
+bullet([
+  'Top half: word card + "Learn and hide" button (capped at max-height: 45vh)',
+  'Bottom half: 2\u00d72 grid of four translation options',
+  'Wrong tap: red flash, resets; correct tap: green, Next active; m2++ on advance',
+])
+h2('Mode 3 -- MatchingGrid')
+bullet([
+  '2 columns: 6 words (left) and 6 translations (right), each independently shuffled',
+  'Tap word -> orange highlight; tap matching translation -> green + deactivated',
+  'Wrong translation: red flash, word stays selected',
+  'All 6 matched -> Next active; m3++ for all 6 words on advance',
+  'No "Learn and hide" button in Mode 3',
+])
+divider()
+
+h1('8. Authentication')
+h2('Silent Sign-In Flow')
+bullet([
+  'On app load: trySilentSignIn() calls requestAccessToken({ prompt: \'\' })',
+  'If previously authorised: token returned without UI -> navigate to Home',
+  'If not: GIS popup shown; on failure stays on LoginScreen',
+  'User profile (email, name, picture) fetched and saved to localStorage',
+])
+h2('Token Lifecycle')
+bullet([
+  'Access token stored in memory -- never in localStorage',
+  'Token lifetime: 1 hour (GIS implicit flow)',
+  'On 401 from any API call: refreshTokenIfNeeded() re-requests silently',
 ])
 h2('Required OAuth Scopes')
 bullet([
-  'email, profile',
-  'https://www.googleapis.com/auth/spreadsheets',
-  'https://www.googleapis.com/auth/drive.metadata.readonly',
-])
-h2('Google Cloud Console Setup')
-bullet([
-  'Enable Google Sheets API v4 and Google Drive API on the project',
-  'OAuth 2.0 Client ID \u2014 type: Web application',
-  'Authorized JavaScript Origins: http://localhost:5173 (dev) + production URL (prod)',
-  'OAuth consent screen: Testing mode, personal Google account added as test user',
+  'email, profile -- user identity',
+  'https://www.googleapis.com/auth/spreadsheets -- read/write db_words spreadsheet',
+  'https://www.googleapis.com/auth/drive.metadata.readonly -- find spreadsheet in Drive',
 ])
 divider()
 
-// ── 9 ─────────────────────────────────────────────────────────────────────────
-h1('9. Google Sheets API Integration')
-body('All Sheets and Drive calls are plain fetch() calls in sheetsApi.js, using the in-memory access token.')
+h1('9. Sheets API Integration')
 h2('Key API Calls')
 code([
-  '// Find "Words" file in Drive',
-  "GET drive/v3/files?q=name='Words'&mimeType=...spreadsheet...&trashed=false",
+  'Drive: find db_words',
+  "  GET /drive/v3/files?q=name='db_words'...",
   '',
-  '// Create file if not found',
-  'POST drive/v3/files',
+  'Sheets: create if not found',
+  "  POST /v4/spreadsheets  { properties: { title: 'db_words' } }",
   '',
-  '// List tabs (to populate LanguageScreen)',
-  'GET sheets/v4/spreadsheets/{id}?fields=sheets.properties.title',
+  'Sheets: list language tabs',
+  '  GET /v4/spreadsheets/{id}?fields=sheets.properties.title',
   '',
-  '// Read words for selected tab',
-  'GET sheets/v4/spreadsheets/{id}/values/{tab}!A2:G',
+  'Sheets: read words',
+  '  GET /v4/spreadsheets/{id}/values/{tab}!A1:G',
   '',
-  '// Read _settings tab',
-  'GET sheets/v4/spreadsheets/{id}/values/_settings!A1:A2',
+  'Sheets: batch-update counters after session',
+  '  POST /v4/spreadsheets/{id}/values:batchUpdate',
+  "  { valueInputOption: 'RAW', data: [{ range: '{tab}!D{row}:G{row}', values: [[m1,m2,m3,learned]] }] }",
   '',
-  '// Batch update counters after session',
-  'POST sheets/v4/spreadsheets/{id}/values:batchUpdate',
-  '  body: { data: [ { range: "{tab}!D{row}:G{row}", values: [[m1,m2,m3,learned]] } ] }',
-  '',
-  '// Write settings',
-  'PUT sheets/v4/spreadsheets/{id}/values/_settings!A1:A2',
-  '  body: { values: [[language], [category]] }',
-])
-h2('Batch Save Strategy')
-bullet([
-  'Counter increments accumulated in memory during the session (updates array)',
-  'batchUpdateWords() called once after step 12 completes (or on navigation away)',
-  '"Learn and forget" button triggers an immediate single-row update (setLearned)',
-  'resetWord() writes [[0, 0, 0, "FALSE"]] to reset all counters + learned flag',
+  'Mark learned:    PUT /v4/spreadsheets/{id}/values/{tab}!G{row}?valueInputOption=RAW',
+  'Reset counters:  PUT /v4/spreadsheets/{id}/values/{tab}!D{row}:G{row}?valueInputOption=RAW',
+  '_settings read:  GET /v4/spreadsheets/{id}/values/_settings!A1:A2',
+  '_settings write: PUT /v4/spreadsheets/{id}/values/_settings!A1:A2?valueInputOption=RAW',
 ])
 divider()
 
-// ── 10 ────────────────────────────────────────────────────────────────────────
-h1('10. UI / UX Design')
-h2('Theme')
-bullet([
-  'Color mode: follows system prefers-color-scheme (light / dark, automatic)',
-  'Primary accent: #E8935A \u2014 soft warm orange (slightly brighter in light mode)',
-  'Dark mode accent: #D4804A (slightly muted)',
-  'Dark mode background: #2B2B2B',
-  'Base font size: 16px minimum (enforced in html {})',
-  'Success: #6BBF7A  |  Error: #E07070  |  Border: #D0D0D0 (light) / #4A4A4A (dark)',
+h1('10. UI & Theme')
+h2('Color System (CSS Variables)')
+code([
+  '                    Light           Dark',
+  '--bg                #FFFFFF          #1C1C1C',
+  '--surface           #F3F1EF          #2B2B2B',
+  '--surface-2         #E8E8E8          #363636',
+  '--text              #1C1C1C          #EFEFEF',
+  '--text-muted        #6B6B6B          #949494',
+  '--accent            #E07E38          #E8935A',
+  '--success           #6BBF7A          #5AA569',
+  '--error             #E07070          #C96060',
+  '--border            #E0E0E0          #4A4A4A',
+  '--card-bg           #FFFFFF          #363636',
 ])
-h2('CSS Architecture')
+h2('Layout Rules')
 bullet([
-  'Global variables in theme.css (:root + dark media query)',
-  'Per-component CSS Modules (.module.css) for scoped class names',
-  'Global utility classes: .btn, .btn-ghost (in App.css or global.css)',
-  'Card style: --card-bg, --border, --radius (12px)',
-])
-h2('Touch & Mobile')
-bullet([
-  'Minimum tap target: 44px+ on all interactive elements',
-  '-webkit-tap-highlight-color: transparent on all buttons',
-  'FlipCard: vertical swipe (touchstart/touchend, delta Y > 50px) triggers flip',
-  'Layout: 100dvh with overflow:hidden on wrapper, internal scroll where needed',
-  'No horizontal scrolling at any screen size',
+  'All screens: height: 100dvh; overflow: hidden',
+  'Next button wrapper: margin-top: auto in flex column -- pins to bottom',
+  'Mode 2 top half: max-height: 45vh',
 ])
 divider()
 
-// ── 11 ────────────────────────────────────────────────────────────────────────
-h1('11. PWA & Mobile')
+h1('11. PWA')
 bullet([
-  'Web App Manifest: name "Words", short_name "Words", display standalone',
-  'Theme color: #E8935A (set in manifest.json and <meta name="theme-color"> in index.html)',
-  'Background color: matches --bg variable (white in light mode)',
+  'manifest.json: name="Words", short_name="Words", display=standalone, theme_color="#E07E38"',
+  'Service worker: App Shell cached on install; Sheets/Drive API uses network-first with cache fallback',
   'Icons: icon-192.png and icon-512.png',
-  'Service Worker (sw.js): App Shell caching (HTML / JS / CSS / icons)',
-  'Network-first strategy for Google API calls; cache-first for static assets',
-  'Android: Chrome shows automatic install banner or browser menu \u2192 Install app',
-  'iOS: Safari Share menu \u2192 "Add to Home Screen"',
+  'Android: Chrome install prompt; iOS: Safari Share -> Add to Home Screen',
 ])
 divider()
 
-// ── 12 ────────────────────────────────────────────────────────────────────────
-h1('12. Deployment')
-h2('Vercel (Recommended)')
-bullet([
-  'Connect the GitHub repository at vercel.com',
-  'Add environment variable: VITE_GOOGLE_CLIENT_ID',
-  'Build command: npm run build  |  Output: dist/',
-  'Every push to main triggers automatic build and deployment',
-  'Add the Vercel URL to Google Cloud Console Authorized JavaScript Origins',
-])
+h1('12. Setup & Deployment')
 h2('Local Development')
 code([
-  '1. git clone https://github.com/JuliaSivridi/Words.git',
-  '2. cd Words && npm install',
-  '3. Create .env:   VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com',
-  '4. npm run dev    ->   http://localhost:5173',
-  '5. npm run build  ->   production output in dist/',
+  '1.  git clone https://github.com/JuliaSivridi/Words.git',
+  '2.  npm install',
+  '3.  Create .env:  VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com',
+  '4.  npm run dev   ->  http://localhost:5173',
+  '5.  npm run build ->  production output in dist/',
 ])
-divider()
-
-// ── 13 ────────────────────────────────────────────────────────────────────────
-h1('13. Key File Structure')
-code([
-  'src/',
-  '  App.jsx             root router, auth + sheet state, settings sync',
-  '  auth.js             GIS token client, silent sign-in, token refresh',
-  '  sheetsApi.js        Drive / Sheets API fetch wrappers',
-  '  constants.js        M1_MAX=4  M2_MAX=12  M3_MAX=24  TOTAL_REPS=40',
-  '  theme.css           CSS variables, light/dark theme, min 16px font',
-  '  screens/',
-  '    LoginScreen.jsx          Google sign-in page',
-  '    HomeScreen.jsx           Start / Language / Category / Word List buttons',
-  '    SessionScreen.jsx        12-step session orchestration + progress bar',
-  '    WordListScreen.jsx       scrollable word list with learned toggle',
-  '    LanguageScreen.jsx       tab selection from "Words" spreadsheet',
-  '    CategoryScreen.jsx       multi-select category filter',
-  '  components/',
-  '    FlipCard.jsx             Mode 1: flip card with swipe support',
-  '    MultipleChoice.jsx       Mode 2: 2x2 choice grid',
-  '    MatchingGrid.jsx         Mode 3: 6-pair matching columns',
-  '    NextButton.jsx           shared "Next \u2192" button',
-  '    WordListItem.jsx         single row in word list',
-  '  hooks/',
-  '    useWords.js              word load / save / reset hook',
-  '    useSession.js            buildSession() \u2014 12-step session builder',
-  'public/',
-  '  manifest.json       PWA manifest',
-  '  sw.js               service worker (App Shell cache)',
-  '  icons/              icon-192.png  icon-512.png',
-  'index.html            GIS script tag, theme-color meta',
-  'vite.config.js        @vitejs/plugin-react',
-  '.env                  VITE_GOOGLE_CLIENT_ID  (not committed)',
+h2('Google Cloud Console')
+bullet([
+  'Enable Google Sheets API v4 and Google Drive API',
+  'OAuth 2.0 Client ID -- type: Web application',
+  'Authorized JavaScript Origins: http://localhost:5173 + your production URL',
+  'OAuth consent screen: Testing mode, add your Google account as a test user',
 ])
+h2('First-Time Data Setup')
+body(
+  'No manual spreadsheet setup required. On first login the app searches Google Drive for "db_words" and ' +
+  'creates it if absent. Add a sheet tab named like "RU-EN", put words in columns B and C ' +
+  '(category optionally in column A), and start a session.'
+)
 
-// ── Footer ────────────────────────────────────────────────────────────────────
+// Footer
 doc.moveDown(1.5)
 divider()
 doc.fontSize(8.5).fillColor(LGRAY).font('Helvetica')
-  .text('Words  \u00b7  Technical Specification  \u00b7  March 2026', { align: 'center' })
+  .text('Words  \u00b7  Technical Specification  \u00b7  April 2026', { align: 'center' })
 
 doc.end()
 console.log('Done: docs/Words_TechSpec.pdf')
