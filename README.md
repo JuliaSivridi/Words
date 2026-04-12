@@ -122,4 +122,4 @@ All data lives in the user's **Words** Google Spreadsheet (found or created auto
 
 ## Technical Documentation
 
-See [`docs/Words_TechSpec.pdf`](docs/Words_TechSpec.pdf) for the full technical reference covering architecture, data model, game mechanics, auth flow, API integration, and deployment.
+See [`docs/technical-doc.html`](docs/technical-doc.html) for the full technical reference covering architecture, data model, game mechanics, auth flow, API integration, and deployment.

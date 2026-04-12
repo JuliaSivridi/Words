@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Words — Technical Documentation</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.65;
+    color: #1a1a1a;
+    background: #fff;
+    padding: 0;
+  }
+
+  /* Cover page */
+  .cover {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 80px 72px;
+    background: #1c1c1c;
+    color: #fff;
+    page-break-after: always;
+  }
+  .cover .logo {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+  .cover .logo span { color: #e07e38; }
+  .cover .subtitle {
+    font-size: 18px;
+    color: #a1a1aa;
+    margin-bottom: 40px;
+  }
+  .cover .meta { font-size: 13px; color: #71717a; line-height: 2; }
+  .cover .meta strong { color: #d4d4d8; }
+  .cover .accent-line {
+    width: 60px;
+    height: 4px;
+    background: #e07e38;
+    border-radius: 2px;
+    margin-bottom: 32px;
+  }
+  .cover .tagline {
+    margin-top: 48px;
+    padding: 16px 20px;
+    border: 1px solid #2a2a2a;
+    border-left: 3px solid #e07e38;
+    border-radius: 6px;
+    background: #222;
+    font-size: 12px;
+    color: #a1a1aa;
+    max-width: 480px;
+  }
+  .cover .tagline strong { color: #e4e4e7; }
+
+  /* Content pages */
+  .content {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 56px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1c1c1c;
+    margin-top: 48px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e07e38;
+    page-break-before: always;
+  }
+  h1:first-child { page-break-before: avoid; margin-top: 0; }
+
+  h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1c1c1c;
+    margin-top: 32px;
+    margin-bottom: 10px;
+  }
+
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-top: 20px;
+    margin-bottom: 6px;
+  }
+
+  p { margin-bottom: 12px; }
+
+  a { color: #e07e38; text-decoration: none; }
+
+  ul, ol {
+    margin: 8px 0 12px 22px;
+  }
+  li { margin-bottom: 4px; }
+
+  code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 12px;
+    background: #f4f4f5;
+    border: 1px solid #e4e4e7;
+    border-radius: 3px;
+    padding: 1px 5px;
+    color: #c2410c;
+  }
+
+  pre {
+    background: #1c1c1c;
+    color: #e4e4e7;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0 16px;
+    overflow-x: auto;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 11.5px;
+    line-height: 1.6;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 16px;
+    font-size: 12.5px;
+  }
+  th {
+    background: #f4f4f5;
+    font-weight: 600;
+    text-align: left;
+    padding: 8px 12px;
+    border: 1px solid #e4e4e7;
+    color: #374151;
+  }
+  td {
+    padding: 7px 12px;
+    border: 1px solid #e4e4e7;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+    margin-right: 4px;
+  }
+
+  .callout {
+    background: #fff7ed;
+    border-left: 3px solid #e07e38;
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 12.5px;
+  }
+
+  .note {
+    background: #f0f9ff;
+    border-left: 3px solid #0ea5e9;
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 12.5px;
+  }
+
+  .dir-tree {
+    background: #1c1c1c;
+    color: #e4e4e7;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 0 16px;
+    font-family: 'Consolas', monospace;
+    font-size: 11.5px;
+    line-height: 1.8;
+  }
+  .dir-tree .dim  { color: #71717a; }
+  .dir-tree .org  { color: #fb923c; }
+  .dir-tree .grn  { color: #86efac; }
+  .dir-tree .blu  { color: #93c5fd; }
+
+  .toc {
+    background: #fafafa;
+    border: 1px solid #e4e4e7;
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin: 24px 0 32px;
+  }
+  .toc h2 { margin-top: 0; margin-bottom: 12px; font-size: 15px; }
+  .toc ol { margin: 0; }
+  .toc li { margin-bottom: 6px; font-size: 13px; }
+  .toc li a { color: #374151; }
+  .toc li a:hover { color: #e07e38; }
+
+  @media print {
+    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── Cover ──────────────────────────────────────────────────────────────── -->
+<div class="cover">
+  <div class="logo">Words</div>
+  <div class="subtitle">Technical Documentation</div>
+  <div class="accent-line"></div>
+  <div class="meta">
+    <strong>Version:</strong> 1.0 (April 2026)<br>
+    <strong>Repository:</strong> github.com/JuliaSivridi/Words<br>
+    <strong>Stack:</strong> React 18 · JavaScript · Vite 6 · Google Sheets API v4
+  </div>
+  <div class="tagline">
+    A personal vocabulary learning app delivered as a serverless PWA.
+    Words are studied through three progressively harder modes —
+    <strong>FlipCard → MultipleChoice → MatchingGrid</strong> — with spaced repetition
+    counters stored directly in Google Sheets. No backend, no subscription.
+  </div>
+</div>
+
+<!-- ─── Content ────────────────────────────────────────────────────────────── -->
+<div class="content">
+
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#tech-stack">Tech Stack</a></li>
+    <li><a href="#architecture">Project Architecture</a></li>
+    <li><a href="#data-model">Data Model</a></li>
+    <li><a href="#session">Session Algorithm</a></li>
+    <li><a href="#screens">Screens &amp; Navigation</a></li>
+    <li><a href="#auth">Authentication</a></li>
+    <li><a href="#api">Google Sheets API Integration</a></li>
+    <li><a href="#ui">UI &amp; Theme</a></li>
+    <li><a href="#pwa">PWA &amp; Mobile</a></li>
+    <li><a href="#setup">Setup &amp; Deployment</a></li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="overview">1. Overview</h1>
+
+<p>
+  Words is a personal vocabulary learning application delivered as a
+  <strong>Progressive Web App (PWA)</strong>. It runs in any modern browser and installs on
+  Android and iOS home screens as a standalone app. There is no dedicated backend server —
+  all persistent data lives in a <strong>Google Spreadsheet</strong> (named <code>db_words</code>)
+  found or created automatically via the Google Drive API v3.
+</p>
+
+<p>
+  Words are studied through three progressively harder exercise modes. Each mode has its own
+  repetition counter per word. Once a word completes all three modes (24 total repetitions),
+  it is automatically marked as learned and removed from future sessions.
+</p>
+
+<h2>Key Design Goals</h2>
+<ul>
+  <li><strong>Zero backend</strong> — Google Sheets as a database; no server-side code</li>
+  <li><strong>Any language pair</strong> — each sheet tab is a separate language pair (e.g. <code>RU-EN</code>)</li>
+  <li><strong>Spaced repetition</strong> — three modes, each requiring progressively more repetitions</li>
+  <li><strong>Category filter</strong> — words tagged by category; sessions and word list filter by category</li>
+  <li><strong>Cross-device sync</strong> — selected language and category filter stored in the sheet</li>
+  <li><strong>Mobile-first</strong> — 16 px minimum font, touch-friendly, installable PWA</li>
+  <li><strong>Dark mode</strong> — follows OS preference; consistent color palette across all screens</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="tech-stack">2. Tech Stack</h1>
+
+<table>
+  <tr><th>Layer</th><th>Technology</th><th>Version</th><th>Notes</th></tr>
+  <tr><td>UI framework</td><td>React</td><td>18</td><td>Hooks only; no class components</td></tr>
+  <tr><td>Language</td><td>JavaScript</td><td>ES2022</td><td>No TypeScript</td></tr>
+  <tr><td>Build tool</td><td>Vite</td><td>6</td><td>ES modules, HMR</td></tr>
+  <tr><td>Styling</td><td>CSS Modules + CSS variables</td><td>—</td><td>Light/dark via <code>prefers-color-scheme</code></td></tr>
+  <tr><td>Routing</td><td>React Router DOM</td><td>6</td><td>Client-side; hash-free URLs</td></tr>
+  <tr><td>Database</td><td>Google Sheets API v4</td><td>—</td><td>Row-per-word; direct browser fetch</td></tr>
+  <tr><td>File discovery</td><td>Google Drive API v3</td><td>—</td><td>Find or create <code>db_words</code> spreadsheet</td></tr>
+  <tr><td>Auth</td><td>Google Identity Services</td><td>—</td><td>OAuth 2.0 implicit grant; silent sign-in</td></tr>
+  <tr><td>Offline storage</td><td>None</td><td>—</td><td>localStorage for language/category prefs only</td></tr>
+  <tr><td>PWA</td><td>Manual manifest + SW</td><td>—</td><td>manifest.json + sw.js; no Workbox</td></tr>
+  <tr><td>Hosting</td><td>Any static host</td><td>—</td><td>Vercel, Netlify, GitHub Pages</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="architecture">3. Project Architecture</h1>
+
+<p>
+  The app is a single-page React application. All state is managed locally in React hooks and
+  passed top-down from <code>App.jsx</code>. There are no global state stores — the component tree
+  is shallow enough that prop drilling is manageable.
+</p>
+
+<div class="dir-tree">
+<span class="org">src/</span><br>
+├── App.jsx               <span class="dim"># root router, auth state, sheet ID, language &amp; category</span><br>
+├── auth.js               <span class="dim"># GIS token client, trySilentSignIn(), onAuthChange()</span><br>
+├── sheetsApi.js          <span class="dim"># Drive + Sheets API fetch wrappers (all API calls)</span><br>
+├── constants.js          <span class="dim"># M1_MAX=4  M2_MAX=8  M3_MAX=12  TOTAL_REPS=24</span><br>
+├── langMap.js            <span class="dim"># tab name → display label mapping</span><br>
+├── theme.css             <span class="dim"># CSS variables, light/dark theme, global utilities</span><br>
+├── <span class="blu">screens/</span><br>
+│   ├── LoginScreen.jsx   <span class="dim"># Google sign-in page</span><br>
+│   ├── HomeScreen.jsx    <span class="dim"># Start / Language / Category / Word List buttons</span><br>
+│   ├── SessionScreen.jsx <span class="dim"># 12-step session orchestration + progress bar</span><br>
+│   ├── WordListScreen.jsx <span class="dim"># scrollable word list with learned toggle</span><br>
+│   ├── LanguageScreen.jsx <span class="dim"># tab selection from db_words spreadsheet</span><br>
+│   └── CategoryScreen.jsx <span class="dim"># multi-select category filter</span><br>
+├── <span class="grn">components/</span><br>
+│   ├── FlipCard.jsx      <span class="dim"># Mode 1: flip card, swipe support, Learn and hide</span><br>
+│   ├── MultipleChoice.jsx <span class="dim"># Mode 2: 2×2 choice grid</span><br>
+│   ├── MatchingGrid.jsx  <span class="dim"># Mode 3: 6-pair matching columns</span><br>
+│   ├── NextButton.jsx    <span class="dim"># shared "Next →" button, sticky at bottom</span><br>
+│   ├── CheckIcon.jsx     <span class="dim"># shared Lucide-style checkmark SVG</span><br>
+│   └── WordListItem.jsx  <span class="dim"># single row in word list</span><br>
+└── <span class="blu">hooks/</span><br>
+    ├── useWords.js       <span class="dim"># load words, saveSessionUpdates, setLearned, resetWord</span><br>
+    └── useSession.js     <span class="dim"># buildSession() — 12-step session builder</span><br>
+</div>
+
+<h2>Data Flow</h2>
+<ol>
+  <li><strong>App start</strong> → <code>trySilentSignIn()</code> → if ok: <code>findOrCreateWordsFile()</code> → <code>readSettings()</code></li>
+  <li>Settings (language + category) restored from sheet, overriding localStorage values</li>
+  <li><code>useWords(sheetId, tab)</code> fetches all rows for the selected tab via Sheets API</li>
+  <li><code>buildSession(words, categoryFilter)</code> plans 12 steps; mode components render each step</li>
+  <li>User completes a step → counter incremented in memory (<code>pendingUpdates</code> ref)</li>
+  <li>After step 12 → <code>batchUpdateWords()</code> sends all counter updates to Sheets in one call</li>
+  <li>"Learn and hide" → immediate single-row update via <code>markLearned()</code></li>
+</ol>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="data-model">4. Data Model</h1>
+
+<p>
+  All data lives in the user's Google Spreadsheet named <code>db_words</code>. The app finds it in
+  Google Drive by name and creates it automatically on first login. Each language pair is a
+  separate sheet tab.
+</p>
+
+<h2>Word Tab (e.g. <code>RU-EN</code>)</h2>
+<p>
+  Tab name format: <code>TRANSLATION-STUDY</code>. For <code>RU-EN</code> the user studies English;
+  column C holds the Russian translation. Row 1 is treated as a header only if
+  <code>B1 = "word"</code> (case-insensitive); otherwise all rows are data.
+</p>
+
+<table>
+  <tr><th>Col</th><th>Field</th><th>Type</th><th>Notes</th></tr>
+  <tr><td>A</td><td>category</td><td>string</td><td>Optional grouping label (e.g. "Verbs", "Food")</td></tr>
+  <tr><td>B</td><td>word</td><td>string</td><td>The word being studied (target language)</td></tr>
+  <tr><td>C</td><td>translation</td><td>string</td><td>Native language meaning</td></tr>
+  <tr><td>D</td><td>m1</td><td>number</td><td>FlipCard repetition count — graduates at 4</td></tr>
+  <tr><td>E</td><td>m2</td><td>number</td><td>MultipleChoice repetition count — graduates at 8</td></tr>
+  <tr><td>F</td><td>m3</td><td>number</td><td>MatchingGrid repetition count — auto-learned at 12</td></tr>
+  <tr><td>G</td><td>learned</td><td><code>TRUE | FALSE</code></td><td>Hides word from future sessions</td></tr>
+</table>
+
+<h2><code>_settings</code> Tab</h2>
+<p>Stores cross-device preferences. Created automatically on first settings write.</p>
+<table>
+  <tr><th>Cell</th><th>Content</th></tr>
+  <tr><td><code>A1</code></td><td>Last selected language tab code (e.g. <code>RU-EN</code>)</td></tr>
+  <tr><td><code>A2</code></td><td>Category filter — comma-separated names, or empty string for "all"</td></tr>
+</table>
+
+<div class="callout">
+  <strong>Sync strategy:</strong> Language and category are stored in both localStorage (for fast
+  initial load) and the <code>_settings</code> tab (for cross-device sync). On login, sheet values
+  win and overwrite localStorage.
+</div>
+
+<h2>Repetition Constants (<code>constants.js</code>)</h2>
+<table>
+  <tr><th>Constant</th><th>Value</th><th>Meaning</th></tr>
+  <tr><td><code>M1_MAX</code></td><td>4</td><td>Reps needed to graduate from FlipCard mode</td></tr>
+  <tr><td><code>M2_MAX</code></td><td>8</td><td>Reps needed to graduate from MultipleChoice mode</td></tr>
+  <tr><td><code>M3_MAX</code></td><td>12</td><td>Reps needed to auto-mark word as learned</td></tr>
+  <tr><td><code>TOTAL_REPS</code></td><td>24</td><td>Total repetitions per word (4 + 8 + 12)</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="session">5. Session Algorithm</h1>
+
+<p>
+  Each session consists of exactly 12 steps, built by <code>buildSession(words, categoryFilter)</code>
+  in <code>src/hooks/useSession.js</code>. Counters are accumulated in memory and batch-saved after
+  the final step.
+</p>
+
+<h2>Pool Building</h2>
+<p>Three word pools are built from active (non-learned) words that match the category filter:</p>
+<table>
+  <tr><th>Pool</th><th>Eligibility condition</th></tr>
+  <tr><td>mode1Pool</td><td><code>m1 &lt; 4</code></td></tr>
+  <tr><td>mode2Pool</td><td><code>m1 ≥ 4</code> AND <code>m2 &lt; 8</code></td></tr>
+  <tr><td>mode3Pool</td><td><code>m2 ≥ 8</code> AND <code>m3 &lt; 12</code> AND at least 6 words</td></tr>
+</table>
+
+<h2>Step Planning</h2>
+<p>
+  Available modes receive equal shares of the 12 steps. Unavailable modes donate their slots
+  evenly to the others. The resulting plan is shuffled so modes are interleaved:
+</p>
+<table>
+  <tr><th>Available modes</th><th>Step distribution</th></tr>
+  <tr><td>All three (1, 2, 3)</td><td>4 + 4 + 4</td></tr>
+  <tr><td>Two modes (any)</td><td>6 + 6</td></tr>
+  <tr><td>One mode only</td><td>12</td></tr>
+</table>
+
+<h2>Word Selection per Mode</h2>
+<ul>
+  <li>
+    <strong>Mode 1 &amp; 2</strong> — Shuffled queue: all words in the pool are cycled before any
+    word repeats. Prevents the same word appearing multiple times in one session.
+  </li>
+  <li>
+    <strong>Mode 3</strong> — Pool sorted by <code>m3</code> ascending, then sliced into
+    non-overlapping groups of 6. Each mode 3 step uses the next group (<code>m3i % numGroups</code>),
+    so different words appear on each occurrence.
+  </li>
+</ul>
+
+<h2>Cross-Category Supplements (<code>buildMode3Pool</code>)</h2>
+<p>
+  If a selected category has no words that qualify for mode 3 yet (i.e. no words with
+  <code>m2 ≥ 8</code>), the app supplements the pool with the most-advanced unlearned words from
+  that category. This ensures every selected category is represented in the matching grid even
+  when the user is still early in their learning progression.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="screens">6. Screens &amp; Navigation</h1>
+
+<p>
+  All routing is handled by React Router DOM v6 (<code>BrowserRouter</code>).
+  Routes: <code>/</code>, <code>/session</code>, <code>/words</code>, <code>/language</code>, <code>/category</code>.
+</p>
+
+<h2>LoginScreen</h2>
+<ul>
+  <li>Horizontal logo row: app icon (icon-192.png) + "Words" heading + tagline</li>
+  <li>Two description lines explaining Google Sheets storage and offline capability</li>
+  <li>Orange "Sign in with Google" button — triggers GIS popup flow</li>
+</ul>
+
+<h2>HomeScreen</h2>
+<ul>
+  <li>Top bar: app name + user avatar (tapping signs out)</li>
+  <li>Four buttons in order: <strong>Start</strong> (primary CTA) → Language → Category → Word List</li>
+  <li>Language and Category buttons show a sub-label (selected value or "All categories")</li>
+  <li>All buttons use monochrome Lucide-style SVG icons (<code>currentColor</code>)</li>
+</ul>
+
+<h2>SessionScreen</h2>
+<ul>
+  <li>Top bar: back (✕) button + step counter ("3 / 12") + thin progress bar</li>
+  <li>Renders FlipCard, MultipleChoice, or MatchingGrid depending on <code>step.mode</code></li>
+  <li>NextButton always visible at the bottom (sticky via <code>margin-top: auto</code> in flex column)</li>
+  <li>After step 12: calls <code>batchUpdateWords()</code>, shows "Session complete!" with checkmark</li>
+</ul>
+
+<h2>FlipCard (Mode 1)</h2>
+<ul>
+  <li>CSS 3D flip on X axis (<code>rotateX(180deg)</code>) with 0.5 s cubic-bezier transition</li>
+  <li>Front: word + "tap to flip" hint. Back: translation on surface-colored background</li>
+  <li>Triggers: click / tap / vertical swipe (delta Y &gt; 50 px via <code>touchstart</code>/<code>touchend</code>)</li>
+  <li>"Learn and hide" button: marks word as learned immediately, unlocks Next →</li>
+  <li>Next → unlocks after first flip OR after "Learn and hide"</li>
+</ul>
+
+<h2>MultipleChoice (Mode 2)</h2>
+<ul>
+  <li>Top half: "Learn and hide" button + large word card</li>
+  <li>Bottom half: 2×2 grid of translation choice cards</li>
+  <li>Wrong tap: red flash animation (<code>flash-wrong</code> keyframe), question stays active</li>
+  <li>Correct tap: card turns green, Next → unlocks</li>
+  <li>Wrong answers drawn from the same category-filtered pool; falls back to full word list if &lt; 3 options</li>
+</ul>
+
+<h2>MatchingGrid (Mode 3)</h2>
+<ul>
+  <li>6 word–translation pairs; left column = shuffled words, right column = shuffled translations</li>
+  <li>Bidirectional tap: either column can be tapped first to select; tapping opposite column attempts match</li>
+  <li>Correct pair: both cards turn green + permanently deactivate</li>
+  <li>Wrong pair: both flash red, selection resets</li>
+  <li>All 6 pairs matched → Next → unlocks. No "Learn and hide" in this mode</li>
+</ul>
+
+<h2>LanguageScreen</h2>
+<ul>
+  <li>Lists all sheet tabs from <code>db_words</code> (excludes <code>Sheet1</code>, <code>Лист1</code>, <code>_settings</code>)</li>
+  <li>Selected tab shown with orange checkmark on right (shared <code>&lt;CheckIcon&gt;</code> component)</li>
+  <li>Tapping a tab saves to localStorage + <code>_settings</code> and navigates back to Home</li>
+</ul>
+
+<h2>CategoryScreen</h2>
+<ul>
+  <li>Multi-select: any combination of categories can be active simultaneously</li>
+  <li>"All categories" row at top — toggles between full selection and empty selection</li>
+  <li>Back button saves selection and navigates to Home (no separate "Done" button)</li>
+  <li>Stored as <code>null</code> (all) or <code>string[]</code>; synced to sheet as comma-separated string</li>
+</ul>
+
+<h2>WordListScreen</h2>
+<ul>
+  <li>Header shows "learned / total" counter for visible words</li>
+  <li>Each row: word | translation | progress ("3 / 24") | toggle icon</li>
+  <li>Eye icon: tap to mark as learned (saved immediately). Eye-crossed: tap to reset all counters</li>
+  <li>Filtered by <code>sessionCategory</code> if set</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="auth">7. Authentication</h1>
+
+<p>
+  Authentication uses <strong>Google Identity Services (GIS)</strong> with the OAuth 2.0 implicit
+  token grant. No redirect URIs are needed — only Authorized JavaScript Origins must be configured.
+</p>
+
+<ul>
+  <li>On app load: <code>trySilentSignIn()</code> calls <code>tokenClient.requestAccessToken({ prompt: '' })</code></li>
+  <li>Empty <code>prompt</code> = no UI if user previously granted access; popup only on first login</li>
+  <li>User profile (<code>name</code>, <code>email</code>, <code>picture</code>) fetched from Google userinfo endpoint after token received</li>
+  <li>Email saved in localStorage as <code>login_hint</code> for subsequent silent sign-ins</li>
+  <li>Access token stored in module-level memory variable only (never persisted)</li>
+  <li>On 401 from Sheets API: silent token refresh attempted automatically</li>
+  <li>Sign-out: clears user object and calls <code>google.accounts.oauth2.revoke()</code></li>
+</ul>
+
+<h2>Required OAuth Scopes</h2>
+<ul>
+  <li><code>email</code>, <code>profile</code></li>
+  <li><code>https://www.googleapis.com/auth/spreadsheets</code></li>
+  <li><code>https://www.googleapis.com/auth/drive.metadata.readonly</code></li>
+</ul>
+
+<div class="callout">
+  <strong>Google Cloud Console setup:</strong> Enable Google Sheets API v4 <em>and</em> Google Drive API.
+  Create an OAuth 2.0 Client ID (Web application type). Add your domain to
+  <em>Authorized JavaScript Origins</em> (not Redirect URIs). Add your Google account as a test user
+  in the OAuth consent screen.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="api">8. Google Sheets API Integration</h1>
+
+<p>All API calls are plain <code>fetch()</code> requests in <code>src/sheetsApi.js</code>,
+using the in-memory access token. A central <code>request(url, options)</code> helper
+attaches the Bearer header and calls <code>refreshTokenIfNeeded()</code> before every request.</p>
+
+<h2>Key API Calls</h2>
+<table>
+  <tr><th>Operation</th><th>Endpoint</th></tr>
+  <tr><td>Find spreadsheet</td><td><code>GET drive/v3/files?q=name='db_words'&amp;mimeType=...spreadsheet...</code></td></tr>
+  <tr><td>Create spreadsheet</td><td><code>POST sheets/v4/spreadsheets</code> with <code>{ title: 'db_words' }</code></td></tr>
+  <tr><td>List tabs</td><td><code>GET sheets/v4/spreadsheets/{id}?fields=sheets.properties.title</code></td></tr>
+  <tr><td>Read words</td><td><code>GET sheets/v4/spreadsheets/{id}/values/{tab}!A1:G</code></td></tr>
+  <tr><td>Read settings</td><td><code>GET sheets/v4/spreadsheets/{id}/values/_settings!A1:A2</code></td></tr>
+  <tr><td>Batch update counters</td><td><code>POST sheets/v4/spreadsheets/{id}/values:batchUpdate</code> — range <code>{tab}!D{row}:G{row}</code></td></tr>
+  <tr><td>Mark learned</td><td><code>PUT sheets/v4/spreadsheets/{id}/values/{tab}!G{row}</code></td></tr>
+  <tr><td>Reset word</td><td><code>PUT sheets/v4/spreadsheets/{id}/values/{tab}!D{row}:G{row}</code> — <code>[[0, 0, 0, "FALSE"]]</code></td></tr>
+  <tr><td>Write settings</td><td><code>PUT sheets/v4/spreadsheets/{id}/values/_settings!A1:A2</code></td></tr>
+</table>
+
+<h2>Batch Save Strategy</h2>
+<ul>
+  <li>Counter increments are accumulated in a <code>pendingUpdates</code> ref during the session</li>
+  <li><code>batchUpdateWords()</code> is called once after step 12 — one API call for all 12 updates</li>
+  <li>"Learn and hide" triggers an immediate single-row update (<code>markLearned()</code>)</li>
+  <li><code>resetWord()</code> writes <code>[[0, 0, 0, "FALSE"]]</code> to columns D–G to clear all counters</li>
+  <li>Sheet ID cached in localStorage under <code>words_sheet_id</code> to avoid Drive API calls on repeat visits</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="ui">9. UI &amp; Theme</h1>
+
+<h2>Color System</h2>
+<p>
+  All colors are CSS variables defined in <code>src/theme.css</code>.
+  Dark mode switches automatically via <code>@media (prefers-color-scheme: dark)</code>.
+</p>
+
+<table>
+  <tr><th>Variable</th><th>Light</th><th>Dark</th><th>Usage</th></tr>
+  <tr><td><code>--bg</code></td><td>#FFFFFF</td><td>#1C1C1C</td><td>App background</td></tr>
+  <tr><td><code>--surface</code></td><td>#F3F1EF</td><td>#363636</td><td>Headers, secondary backgrounds</td></tr>
+  <tr><td><code>--surface-2</code></td><td>#E8E8E8</td><td>#424242</td><td>Hover states</td></tr>
+  <tr><td><code>--text</code></td><td>#1C1C1C</td><td>#EFEFEF</td><td>Primary text</td></tr>
+  <tr><td><code>--text-muted</code></td><td>#6B6B6B</td><td>#949494</td><td>Secondary text, counters</td></tr>
+  <tr><td><code>--accent</code></td><td>#E07E38</td><td>#E8935A</td><td>Buttons, checkmarks, progress bar</td></tr>
+  <tr><td><code>--accent-hover</code></td><td>#C96E2F</td><td>#D4804A</td><td>Hover on accent elements</td></tr>
+  <tr><td><code>--success</code></td><td>#6BBF7A</td><td>#5AA569</td><td>Correct answers, learned state</td></tr>
+  <tr><td><code>--error</code></td><td>#E07070</td><td>#C96060</td><td>Wrong answers</td></tr>
+  <tr><td><code>--border</code></td><td>#E0E0E0</td><td>#4A4A4A</td><td>Card borders, dividers</td></tr>
+  <tr><td><code>--card-bg</code></td><td>#FFFFFF</td><td>#363636</td><td>Flashcard backgrounds</td></tr>
+</table>
+
+<div class="note">
+  <strong>Consistency:</strong> The accent color (#E07E38) is intentionally identical to the
+  primary color in the companion Tasks project (<code>HSL 25 75% 55%</code>).
+  In dark mode the accent is lightened to #E8935A for better contrast on dark backgrounds.
+</div>
+
+<h2>Icons</h2>
+<p>
+  All icons are inline SVGs in the Lucide style: <code>viewBox="0 0 24 24"</code>,
+  <code>stroke="currentColor"</code>, <code>strokeWidth="1.75"</code>,
+  <code>strokeLinecap="round"</code>, <code>strokeLinejoin="round"</code>.
+  A shared <code>&lt;CheckIcon size={n}&gt;</code> component is used for all checkmark indicators
+  (language selection, category selection, word list learned state, session complete screen).
+  No icon library package is installed — paths are inlined directly.
+</p>
+
+<h2>Touch &amp; Mobile</h2>
+<ul>
+  <li>Minimum tap target: 44 px on all interactive elements</li>
+  <li><code>-webkit-tap-highlight-color: transparent</code> on all buttons</li>
+  <li>FlipCard: vertical swipe (delta Y &gt; 50 px) triggers flip</li>
+  <li>All screens: <code>height: 100dvh; overflow: hidden</code> — no page-level scroll</li>
+  <li>Content that may exceed viewport (word list) uses internal <code>overflow-y: auto</code></li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="pwa">10. PWA &amp; Mobile</h1>
+
+<ul>
+  <li>Web App Manifest (<code>public/manifest.json</code>): name "Words", display <code>standalone</code></li>
+  <li>Theme color: <code>#E07E38</code> in both <code>manifest.json</code> and <code>&lt;meta name="theme-color"&gt;</code></li>
+  <li>Icons: <code>icon-192.png</code> and <code>icon-512.png</code> — orange rounded square with white "W"</li>
+  <li>Service worker (<code>public/sw.js</code>): App Shell caching for HTML, JS, CSS, icons</li>
+  <li>GIS script (<code>accounts.google.com/gsi/client</code>) loaded with <code>async defer</code> in <code>index.html</code></li>
+  <li>Android: Chrome auto-prompts for installation or browser menu → Install app</li>
+  <li>iOS: Safari → Share button → Add to Home Screen</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<h1 id="setup">11. Setup &amp; Deployment</h1>
+
+<h2>Prerequisites</h2>
+<ul>
+  <li>Google account</li>
+  <li>Google Cloud project with <strong>Google Sheets API v4</strong> and <strong>Google Drive API</strong> enabled</li>
+  <li>OAuth 2.0 Client ID (type: Web application)</li>
+  <li>Node.js ≥ 18</li>
+</ul>
+
+<h2>Google Cloud Console</h2>
+<ol>
+  <li>Enable <strong>Google Sheets API v4</strong> and <strong>Google Drive API</strong></li>
+  <li>Create an <strong>OAuth 2.0 Client ID</strong> → Web application</li>
+  <li>Add to <strong>Authorized JavaScript Origins</strong> (not Redirect URIs):
+    <pre><code>http://localhost:5173
+https://your-app.vercel.app</code></pre>
+  </li>
+  <li>Add your account as a <strong>test user</strong> in the OAuth consent screen</li>
+</ol>
+
+<h2>Prepare Your Google Sheet</h2>
+<p>
+  The app automatically creates the <code>db_words</code> spreadsheet on first login. You only
+  need to add a tab and populate it:
+</p>
+<ol>
+  <li>Open the created <code>db_words</code> spreadsheet in Google Drive</li>
+  <li>Add a tab named like <code>RU-EN</code> (format: <code>TRANSLATION-STUDY</code>)</li>
+  <li>Fill columns: <strong>A</strong> = category (optional), <strong>B</strong> = word, <strong>C</strong> = translation</li>
+  <li>Row 1 can be a header or data — the app auto-detects based on whether B1 = "word"</li>
+</ol>
+
+<h2>Local Development</h2>
+<pre><code>git clone https://github.com/JuliaSivridi/Words.git
+cd Words
+npm install</code></pre>
+
+<p>Create <code>.env</code> in the project root:</p>
+<pre><code>VITE_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com</code></pre>
+
+<pre><code>npm run dev    # http://localhost:5173
+npm run build  # production build → dist/</code></pre>
+
+<h2>Deploy to Vercel</h2>
+<ol>
+  <li>Import the repository at <strong>vercel.com</strong></li>
+  <li>Add environment variable in Settings → Environment Variables:
+      <code>VITE_GOOGLE_CLIENT_ID</code></li>
+  <li>Every push to <code>main</code> triggers automatic deployment</li>
+  <li>Add the Vercel URL to Google Cloud Console Authorized JavaScript Origins</li>
+</ol>
+
+<div class="callout">
+  <strong>Single environment variable:</strong> Unlike the companion Tasks project,
+  Words requires only <code>VITE_GOOGLE_CLIENT_ID</code>. The spreadsheet ID is
+  discovered automatically via the Drive API and cached in localStorage — no
+  <code>VITE_SPREADSHEET_ID</code> needed.
+</div>
+
+</div><!-- /content -->
+</body>
+</html>
