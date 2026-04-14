@@ -21,6 +21,29 @@
   color: var(--accent);
 }
 
+.topBarRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s;
+}
+
+.iconBtn:hover {
+  color: var(--text);
+}
+
 .userBtn {
   background: none;
   border: none;

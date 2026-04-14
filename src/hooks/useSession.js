@@ -1,6 +1,7 @@
 // Builds a 12-step session from the available words.
 // Returns { steps, allLearned }
 import { M1_MAX, M2_MAX, M3_MAX } from '../constants.js'
+import { DEFAULT_SETTINGS, isWordLearned, isWordEligibleForMode } from '../settingsUtils.js'
 
 function pickRandomN(arr, n) {
   const shuffled = [...arr].sort(() => Math.random() - 0.5)
@@ -15,9 +16,9 @@ function shuffle(arr) {
 // Normally mode 3 requires m2 >= M2_MAX, but if some selected categories have
 // no qualifying words yet, we supplement from those categories' most-advanced
 // unlearned words so that every selected category is represented in the grid.
-function buildMode3Pool(active, categoryFilter) {
+function buildMode3Pool(active, categoryFilter, settings) {
   const qualified = active
-    .filter(w => w.m2 >= M2_MAX && w.m3 < M3_MAX)
+    .filter(w => isWordEligibleForMode(w, 3, settings))
     .sort((a, b) => a.m3 - b.m3)
 
   if (!categoryFilter || categoryFilter.length <= 1) return qualified
@@ -51,16 +52,17 @@ function buildMode3Groups(pool) {
 
 // ─── Main session builder ─────────────────────────────────────────────────────
 // categoryFilter: null = all words; string[] = only words whose category is in the array
-export function buildSession(words, categoryFilter = null) {
+// settings: { mode1, mode2, mode3 } — which modes are enabled
+export function buildSession(words, categoryFilter = null, settings = DEFAULT_SETTINGS) {
   const filtered = categoryFilter && categoryFilter.length > 0
     ? words.filter(w => categoryFilter.includes(w.category))
     : words
 
-  const active = filtered.filter(w => !w.learned)
+  const active = filtered.filter(w => !isWordLearned(w, settings))
 
-  const mode1Pool   = active.filter(w => w.m1 < M1_MAX)
-  const mode2Pool   = active.filter(w => w.m1 >= M1_MAX && w.m2 < M2_MAX)
-  const mode3Pool   = buildMode3Pool(active, categoryFilter)
+  const mode1Pool   = active.filter(w => isWordEligibleForMode(w, 1, settings))
+  const mode2Pool   = active.filter(w => isWordEligibleForMode(w, 2, settings))
+  const mode3Pool   = buildMode3Pool(active, categoryFilter, settings)
   const mode3Groups = buildMode3Groups(mode3Pool)
 
   const availableModes = []

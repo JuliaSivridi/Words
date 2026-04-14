@@ -137,8 +137,14 @@ export async function resetWordCounters(sheetId, tab, row) {
 }
 
 // ─── Sheets: _settings tab ───────────────────────────────────────────────────
-// Stores app settings (language, category) for cross-device sync.
-// Layout: A1 = language code (e.g. "RU-EN"), A2 = category (e.g. "Animals" or "")
+// Stores app settings as key-value pairs for human readability:
+//   A1=language   B1=RU-EN
+//   A2=category   B2=Animals
+//   A3=mode1      B3=TRUE
+//   A4=mode2      B4=FALSE
+//   A5=mode3      B5=TRUE
+// Backward compat: old format had only column A (positional). Detected by
+// checking whether A1 contains the literal key "language".
 
 async function ensureSettingsTab(sheetId) {
   const data = await request(`${SHEETS_BASE}/${sheetId}?fields=sheets.properties.title`)
@@ -155,23 +161,51 @@ async function ensureSettingsTab(sheetId) {
 
 export async function readSettings(sheetId) {
   try {
-    const range = encodeURIComponent('_settings!A1:A2')
+    const range = encodeURIComponent('_settings!A1:B10')
     const data = await request(`${SHEETS_BASE}/${sheetId}/values/${range}`)
     const rows = data.values ?? []
+
+    // New key-value format: A1 = "language"
+    if (rows[0]?.[0] === 'language') {
+      const map = {}
+      for (const row of rows) {
+        if (row[0]) map[row[0]] = row[1] ?? ''
+      }
+      return {
+        language: map.language || null,
+        category: map.category || null,
+        mode1: map.mode1 !== 'FALSE',
+        mode2: map.mode2 !== 'FALSE',
+        mode3: map.mode3 !== 'FALSE',
+      }
+    }
+
+    // Legacy format: A1=language value, A2=category value
     return {
       language: rows[0]?.[0] || null,
       category: rows[1]?.[0] || null,
+      mode1: true,
+      mode2: true,
+      mode3: true,
     }
   } catch {
-    return { language: null, category: null }
+    return { language: null, category: null, mode1: true, mode2: true, mode3: true }
   }
 }
 
-export async function writeSettings(sheetId, { language, category }) {
+export async function writeSettings(sheetId, { language, category, mode1, mode2, mode3 }) {
   await ensureSettingsTab(sheetId)
-  const range = encodeURIComponent('_settings!A1:A2')
+  const range = encodeURIComponent('_settings!A1:B5')
   await request(`${SHEETS_BASE}/${sheetId}/values/${range}?valueInputOption=RAW`, {
     method: 'PUT',
-    body: JSON.stringify({ values: [[language ?? ''], [category ?? '']] }),
+    body: JSON.stringify({
+      values: [
+        ['language', language ?? ''],
+        ['category', category ?? ''],
+        ['mode1',    mode1 !== false ? 'TRUE' : 'FALSE'],
+        ['mode2',    mode2 !== false ? 'TRUE' : 'FALSE'],
+        ['mode3',    mode3 !== false ? 'TRUE' : 'FALSE'],
+      ],
+    }),
   })
 }

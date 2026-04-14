@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { buildSession } from '../hooks/useSession.js'
 import { M1_MAX, M2_MAX, M3_MAX } from '../constants.js'
+import { DEFAULT_SETTINGS, isWordLearned } from '../settingsUtils.js'
 import FlipCard from '../components/FlipCard.jsx'
 import MultipleChoice from '../components/MultipleChoice.jsx'
 import MatchingGrid from '../components/MatchingGrid.jsx'
@@ -10,7 +11,7 @@ import styles from './SessionScreen.module.css'
 
 const TOTAL_STEPS = 12
 
-export default function SessionScreen({ sheetId, tab, words, categoryFilter, onSessionComplete }) {
+export default function SessionScreen({ sheetId, tab, words, categoryFilter, settings = DEFAULT_SETTINGS, onSessionComplete }) {
   const navigate = useNavigate()
 
   const [session, setSession] = useState(null)
@@ -30,7 +31,7 @@ export default function SessionScreen({ sheetId, tab, words, categoryFilter, onS
   useEffect(() => {
     if (sessionBuilt.current || !words.length) return
     sessionBuilt.current = true
-    const { steps, allLearned: learned } = buildSession(words, categoryFilter)
+    const { steps, allLearned: learned } = buildSession(words, categoryFilter, settings)
     if (learned || !steps.length) {
       setAllLearned(true)
       return
@@ -49,28 +50,29 @@ export default function SessionScreen({ sheetId, tab, words, categoryFilter, onS
     if (step.mode === 1) {
       const state = getWordState(step.word.row)
       if (state) {
+        const next = { ...state, m1: Math.min(state.m1 + 1, M1_MAX) }
         pendingUpdates.current.set(step.word.row, {
-          ...state,
-          m1: Math.min(state.m1 + 1, M1_MAX),
+          ...next,
+          learned: isWordLearned(next, settings),
         })
       }
     } else if (step.mode === 2) {
       const state = getWordState(step.word.row)
       if (state) {
+        const next = { ...state, m2: Math.min(state.m2 + 1, M2_MAX) }
         pendingUpdates.current.set(step.word.row, {
-          ...state,
-          m2: Math.min(state.m2 + 1, M2_MAX),
+          ...next,
+          learned: isWordLearned(next, settings),
         })
       }
     } else if (step.mode === 3) {
       step.words.forEach(w => {
         const state = getWordState(w.row)
         if (state) {
-          const newM3 = Math.min(state.m3 + 1, M3_MAX)
+          const next = { ...state, m3: Math.min(state.m3 + 1, M3_MAX) }
           pendingUpdates.current.set(w.row, {
-            ...state,
-            m3: newM3,
-            learned: newM3 >= M3_MAX ? true : state.learned,
+            ...next,
+            learned: isWordLearned(next, settings),
           })
         }
       })

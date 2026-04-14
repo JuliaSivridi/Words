@@ -8,6 +8,7 @@ import {
 } from './auth.js'
 import { findOrCreateWordsFile, readSettings, writeSettings } from './sheetsApi.js'
 import { useWords } from './hooks/useWords.js'
+import { DEFAULT_SETTINGS } from './settingsUtils.js'
 
 import LoginScreen from './screens/LoginScreen.jsx'
 import HomeScreen from './screens/HomeScreen.jsx'
@@ -15,6 +16,7 @@ import SessionScreen from './screens/SessionScreen.jsx'
 import WordListScreen from './screens/WordListScreen.jsx'
 import LanguageScreen from './screens/LanguageScreen.jsx'
 import CategoryScreen from './screens/CategoryScreen.jsx'
+import SettingsScreen from './screens/SettingsScreen.jsx'
 
 // ── helpers: persist category as JSON in localStorage ─────────────────────
 function loadCategoryFromStorage() {
@@ -57,6 +59,7 @@ export default function App() {
   )
   // null = "All categories"; string[] = specific categories
   const [sessionCategory, setSessionCategory] = useState(loadCategoryFromStorage)
+  const [modeSettings, setModeSettings] = useState(DEFAULT_SETTINGS)
 
   // ── Auth init ──────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -85,6 +88,11 @@ export default function App() {
           const cat = categoryFromSheetValue(settings.category)
           setSessionCategory(cat)
           saveCategoryToStorage(cat)
+          setModeSettings({
+            mode1: settings.mode1 !== false,
+            mode2: settings.mode2 !== false,
+            mode3: settings.mode3 !== false,
+          })
         } catch {
           // Settings read failed — keep localStorage values
         }
@@ -104,6 +112,7 @@ export default function App() {
       writeSettings(sheetId, {
         language: tab,
         category: categoryToSheetValue(sessionCategory),
+        ...modeSettings,
       }).catch(() => {})
     }
   }
@@ -116,6 +125,18 @@ export default function App() {
       writeSettings(sheetId, {
         language: currentLang ?? '',
         category: categoryToSheetValue(cat),
+        ...modeSettings,
+      }).catch(() => {})
+    }
+  }
+
+  function handleModeSettingsChange(newSettings) {
+    setModeSettings(newSettings)
+    if (sheetId) {
+      writeSettings(sheetId, {
+        language: currentLang ?? '',
+        category: categoryToSheetValue(sessionCategory),
+        ...newSettings,
       }).catch(() => {})
     }
   }
@@ -175,6 +196,15 @@ export default function App() {
         }
       />
       <Route
+        path="/settings"
+        element={
+          <SettingsScreen
+            settings={modeSettings}
+            onChange={handleModeSettingsChange}
+          />
+        }
+      />
+      <Route
         path="/session"
         element={
           sheetId && currentLang ? (
@@ -183,6 +213,7 @@ export default function App() {
               tab={currentLang}
               words={words}
               categoryFilter={sessionCategory}
+              settings={modeSettings}
               onSessionComplete={handleSessionComplete}
             />
           ) : (
