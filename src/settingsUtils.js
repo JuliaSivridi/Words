@@ -21,9 +21,12 @@ function maxes(settings) {
   }
 }
 
-// A word is "learned" when every ACTIVE mode counter has reached its maximum.
+// A word is "learned" when:
+//   • the learned flag is explicitly set (manually marked in Word List), OR
+//   • every ACTIVE mode counter has reached its maximum.
 // If a mode is disabled its counter is ignored entirely.
 export function isWordLearned(word, settings = DEFAULT_SETTINGS) {
+  if (word.learned) return true
   const { m1Max, m2Max, m3Max } = maxes(settings)
   if (settings.mode1 && word.m1 < m1Max) return false
   if (settings.mode2 && word.m2 < m2Max) return false
