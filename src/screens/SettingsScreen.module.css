@@ -86,6 +86,8 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex: 1;
+  min-width: 0;
 }
 
 .rowLabel {
@@ -106,4 +108,68 @@
   flex-shrink: 0;
   cursor: pointer;
   accent-color: var(--accent);
+}
+
+/* ── Number input ────────────────────────────────────────────────────────── */
+.numInput {
+  width: 56px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.numInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ── Max reps wrapper (right side of mode row) ───────────────────────────── */
+.maxWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.maxLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+/* ── Section spacing ─────────────────────────────────────────────────────── */
+.sectionLabel + .list,
+.sectionLabel ~ .list {
+  margin-bottom: 24px;
+}
+
+.content > .sectionLabel:not(:first-child) {
+  margin-top: 24px;
+}
+
+/* ── Reset button ────────────────────────────────────────────────────────── */
+.resetBtn {
+  margin-top: 32px;
+  width: 100%;
+  padding: 14px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.resetBtn:hover {
+  background: var(--surface);
+  color: var(--text);
 }

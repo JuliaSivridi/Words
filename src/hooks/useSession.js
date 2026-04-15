@@ -1,6 +1,5 @@
-// Builds a 12-step session from the available words.
+// Builds a session from the available words.
 // Returns { steps, allLearned }
-import { M1_MAX, M2_MAX, M3_MAX } from '../constants.js'
 import { DEFAULT_SETTINGS, isWordLearned, isWordEligibleForMode } from '../settingsUtils.js'
 
 function pickRandomN(arr, n) {
@@ -74,11 +73,11 @@ export function buildSession(words, categoryFilter = null, settings = DEFAULT_SE
     return { steps: [], allLearned: true }
   }
 
-  // ── Plan: 4 slots per mode; unavailable modes donate their slots equally ────
-  // 3 modes available → 4+4+4
-  // 2 modes available → 6+6
-  // 1 mode available  → 12
-  const TOTAL    = 12
+  // ── Plan: equal slots per mode, total = stepsPerSession ────────────────────
+  // 3 modes available → N/3 each
+  // 2 modes available → N/2 each
+  // 1 mode available  → N all
+  const TOTAL    = settings.stepsPerSession ?? 12
   const perMode  = Math.floor(TOTAL / availableModes.length)
   const remainder = TOTAL % availableModes.length
 

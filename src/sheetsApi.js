@@ -172,11 +172,15 @@ export async function readSettings(sheetId) {
         if (row[0]) map[row[0]] = row[1] ?? ''
       }
       return {
-        language: map.language || null,
-        category: map.category || null,
-        mode1: map.mode1 !== 'FALSE',
-        mode2: map.mode2 !== 'FALSE',
-        mode3: map.mode3 !== 'FALSE',
+        language:        map.language || null,
+        category:        map.category || null,
+        mode1:           map.mode1 !== 'FALSE',
+        mode2:           map.mode2 !== 'FALSE',
+        mode3:           map.mode3 !== 'FALSE',
+        stepsPerSession: parseInt(map.stepsPerSession) || null,
+        m1Max:           parseInt(map.m1Max) || null,
+        m2Max:           parseInt(map.m2Max) || null,
+        m3Max:           parseInt(map.m3Max) || null,
       }
     }
 
@@ -184,27 +188,34 @@ export async function readSettings(sheetId) {
     return {
       language: rows[0]?.[0] || null,
       category: rows[1]?.[0] || null,
-      mode1: true,
-      mode2: true,
-      mode3: true,
+      mode1: true, mode2: true, mode3: true,
+      stepsPerSession: null, m1Max: null, m2Max: null, m3Max: null,
     }
   } catch {
     return { language: null, category: null, mode1: true, mode2: true, mode3: true }
   }
 }
 
-export async function writeSettings(sheetId, { language, category, mode1, mode2, mode3 }) {
+export async function writeSettings(sheetId, {
+  language, category,
+  mode1, mode2, mode3,
+  stepsPerSession, m1Max, m2Max, m3Max,
+}) {
   await ensureSettingsTab(sheetId)
-  const range = encodeURIComponent('_settings!A1:B5')
+  const range = encodeURIComponent('_settings!A1:B9')
   await request(`${SHEETS_BASE}/${sheetId}/values/${range}?valueInputOption=RAW`, {
     method: 'PUT',
     body: JSON.stringify({
       values: [
-        ['language', language ?? ''],
-        ['category', category ?? ''],
-        ['mode1',    mode1 !== false ? 'TRUE' : 'FALSE'],
-        ['mode2',    mode2 !== false ? 'TRUE' : 'FALSE'],
-        ['mode3',    mode3 !== false ? 'TRUE' : 'FALSE'],
+        ['language',        language ?? ''],
+        ['category',        category ?? ''],
+        ['mode1',           mode1 !== false ? 'TRUE' : 'FALSE'],
+        ['mode2',           mode2 !== false ? 'TRUE' : 'FALSE'],
+        ['mode3',           mode3 !== false ? 'TRUE' : 'FALSE'],
+        ['stepsPerSession', stepsPerSession ?? ''],
+        ['m1Max',           m1Max ?? ''],
+        ['m2Max',           m2Max ?? ''],
+        ['m3Max',           m3Max ?? ''],
       ],
     }),
   })

@@ -88,11 +88,16 @@ export default function App() {
           const cat = categoryFromSheetValue(settings.category)
           setSessionCategory(cat)
           saveCategoryToStorage(cat)
-          setModeSettings({
+          setModeSettings(prev => ({
+            ...prev,
             mode1: settings.mode1 !== false,
             mode2: settings.mode2 !== false,
             mode3: settings.mode3 !== false,
-          })
+            ...(settings.stepsPerSession && { stepsPerSession: settings.stepsPerSession }),
+            ...(settings.m1Max && { m1Max: settings.m1Max }),
+            ...(settings.m2Max && { m2Max: settings.m2Max }),
+            ...(settings.m3Max && { m3Max: settings.m3Max }),
+          }))
         } catch {
           // Settings read failed — keep localStorage values
         }

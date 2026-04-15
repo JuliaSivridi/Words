@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { buildSession } from '../hooks/useSession.js'
-import { M1_MAX, M2_MAX, M3_MAX } from '../constants.js'
 import { DEFAULT_SETTINGS, isWordLearned } from '../settingsUtils.js'
 import FlipCard from '../components/FlipCard.jsx'
 import MultipleChoice from '../components/MultipleChoice.jsx'
@@ -9,7 +8,7 @@ import MatchingGrid from '../components/MatchingGrid.jsx'
 import CheckIcon from '../components/CheckIcon.jsx'
 import styles from './SessionScreen.module.css'
 
-const TOTAL_STEPS = 12
+// TOTAL_STEPS comes from settings.stepsPerSession at runtime
 
 export default function SessionScreen({ sheetId, tab, words, categoryFilter, settings = DEFAULT_SETTINGS, onSessionComplete }) {
   const navigate = useNavigate()
@@ -50,7 +49,7 @@ export default function SessionScreen({ sheetId, tab, words, categoryFilter, set
     if (step.mode === 1) {
       const state = getWordState(step.word.row)
       if (state) {
-        const next = { ...state, m1: Math.min(state.m1 + 1, M1_MAX) }
+        const next = { ...state, m1: Math.min(state.m1 + 1, settings.m1Max ?? 4) }
         pendingUpdates.current.set(step.word.row, {
           ...next,
           learned: isWordLearned(next, settings),
@@ -59,7 +58,7 @@ export default function SessionScreen({ sheetId, tab, words, categoryFilter, set
     } else if (step.mode === 2) {
       const state = getWordState(step.word.row)
       if (state) {
-        const next = { ...state, m2: Math.min(state.m2 + 1, M2_MAX) }
+        const next = { ...state, m2: Math.min(state.m2 + 1, settings.m2Max ?? 8) }
         pendingUpdates.current.set(step.word.row, {
           ...next,
           learned: isWordLearned(next, settings),
@@ -69,7 +68,7 @@ export default function SessionScreen({ sheetId, tab, words, categoryFilter, set
       step.words.forEach(w => {
         const state = getWordState(w.row)
         if (state) {
-          const next = { ...state, m3: Math.min(state.m3 + 1, M3_MAX) }
+          const next = { ...state, m3: Math.min(state.m3 + 1, settings.m3Max ?? 12) }
           pendingUpdates.current.set(w.row, {
             ...next,
             learned: isWordLearned(next, settings),
@@ -83,7 +82,8 @@ export default function SessionScreen({ sheetId, tab, words, categoryFilter, set
     const step = session[stepIndex]
     incrementCounter(step)
 
-    if (stepIndex + 1 >= TOTAL_STEPS) {
+    const totalSteps = settings.stepsPerSession ?? 12
+    if (stepIndex + 1 >= totalSteps) {
       // Session done — collect and save
       const updates = []
       pendingUpdates.current.forEach((state, row) => {
@@ -152,12 +152,12 @@ export default function SessionScreen({ sheetId, tab, words, categoryFilter, set
     <div className={styles.screen}>
       {/* Progress bar */}
       <div className={styles.progressBar}>
-        <div className={styles.progressFill} style={{ width: `${((stepIndex) / TOTAL_STEPS) * 100}%` }} />
+        <div className={styles.progressFill} style={{ width: `${(stepIndex / (settings.stepsPerSession ?? 12)) * 100}%` }} />
       </div>
 
       <div className={styles.topBar}>
         <button className={styles.backBtn} onClick={() => navigate('/')}>✕</button>
-        <span className={styles.stepCount}>{stepIndex + 1} / {TOTAL_STEPS}</span>
+        <span className={styles.stepCount}>{stepIndex + 1} / {settings.stepsPerSession ?? 12}</span>
         <span style={{ width: 40 }} />
       </div>
 
