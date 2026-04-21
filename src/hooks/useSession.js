@@ -30,7 +30,7 @@ function buildMode3Pool(active, categoryFilter, settings) {
   const slotsPerCat = Math.ceil(6 / categoryFilter.length)
   const supplements = missingCats.flatMap(cat =>
     active
-      .filter(w => w.category === cat && w.m3 < M3_MAX)
+      .filter(w => w.category === cat)   // active is already unlearned; no extra counter check needed
       .sort((a, b) => (b.m2 + b.m1) - (a.m2 + a.m1))
       .slice(0, slotsPerCat)
   )

@@ -101,13 +101,16 @@ export async function getWords(sheetId, tab) {
 
 // ─── Sheets: batch-update counters after session ─────────────────────────────
 
-// updates is array of { row, m1, m2, m3, learned }
+// updates is array of { row, m1, m2, m3 }
+// Only writes counters (D:F) — the learned column (G) is NEVER touched here.
+// Marking as learned is done separately via markLearned(), so a manually-set
+// learned=TRUE can never be overwritten by session results.
 export async function batchUpdateWords(sheetId, tab, updates) {
   if (!updates.length) return
 
   const data = updates.map(u => ({
-    range: `${tab}!D${u.row}:G${u.row}`,
-    values: [[u.m1, u.m2, u.m3, u.learned ? 'TRUE' : 'FALSE']],
+    range: `${tab}!D${u.row}:F${u.row}`,
+    values: [[u.m1, u.m2, u.m3]],
   }))
 
   await request(`${SHEETS_BASE}/${sheetId}/values:batchUpdate`, {

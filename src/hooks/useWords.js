@@ -32,15 +32,17 @@ export function useWords(sheetId, tab) {
   // After session: save updated counters for changed words
   const saveSessionUpdates = useCallback(async (updatedWords) => {
     if (!sheetId || !tab) return
-    const updates = updatedWords.map(w => ({
-      row: w.row,
-      m1: w.m1,
-      m2: w.m2,
-      m3: w.m3,
-      learned: w.learned,
-    }))
-    await batchUpdateWords(sheetId, tab, updates)
-    // Merge updates: keep word/translation, override counters/learned
+
+    // 1. Write counters only (D:F) — never write the learned column from here.
+    //    This prevents session results from ever overwriting a manually-set learned=TRUE.
+    await batchUpdateWords(sheetId, tab, updatedWords)
+
+    // 2. For words that just became learned (reached all mode maxes), mark them
+    //    explicitly. Idempotent if handleLearn already called markLearned earlier.
+    const learnedWords = updatedWords.filter(w => w.learned)
+    await Promise.all(learnedWords.map(w => markLearned(sheetId, tab, w.row, true)))
+
+    // 3. Merge into local state
     setWords(prev =>
       prev.map(w => {
         const updated = updatedWords.find(u => u.row === w.row)
