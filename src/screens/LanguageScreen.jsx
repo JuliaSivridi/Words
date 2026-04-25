@@ -5,7 +5,7 @@ import { parseLangLabel } from '../langMap.js'
 import CheckIcon from '../components/CheckIcon.jsx'
 import styles from './LanguageScreen.module.css'
 
-export default function LanguageScreen({ sheetId, currentLang, onSelect }) {
+export default function LanguageScreen({ sheetId, currentLang, onSelect, onReconnect }) {
   const navigate = useNavigate()
   const [tabs, setTabs] = useState([])
   const [loading, setLoading] = useState(true)
@@ -42,8 +42,18 @@ export default function LanguageScreen({ sheetId, currentLang, onSelect }) {
           <div className={styles.empty}>
             <p>No language sheets found.</p>
             <p className="text-muted" style={{ marginTop: 8, fontSize: '0.9rem' }}>
-              Open your <strong>Words</strong> Google Sheet and add a tab named like <strong>RU-EN</strong> (translation–study language).
+              Open your <strong>db_words</strong> Google Sheet and add a tab named like{' '}
+              <strong>RU-EN</strong> (translation–study language).
             </p>
+            {onReconnect && (
+              <button
+                className="btn btn-ghost"
+                style={{ marginTop: 16 }}
+                onClick={onReconnect}
+              >
+                Reconnect to sheet
+              </button>
+            )}
           </div>
         )}
 

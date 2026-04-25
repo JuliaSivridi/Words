@@ -54,6 +54,7 @@ export default function App() {
   const [authReady, setAuthReady] = useState(false)
   const [user, setUser] = useState(null)
   const [sheetId, setSheetId] = useState(null)
+  const [sheetSearchKey, setSheetSearchKey] = useState(0)
   const [currentLang, setCurrentLang] = useState(
     () => localStorage.getItem('words_lang') ?? null
   )
@@ -74,6 +75,8 @@ export default function App() {
   }, [])
 
   // ── Find sheet + sync settings after login ─────────────────────────────────
+  // sheetSearchKey lets us re-trigger this effect without changing user state
+  // (used by handleReconnectSheet when the cached sheet ID is wrong)
   useEffect(() => {
     if (!user) { setSheetId(null); return }
     findOrCreateWordsFile()
@@ -103,7 +106,15 @@ export default function App() {
         }
       })
       .catch(() => setSheetId(null))
-  }, [user])
+  }, [user, sheetSearchKey])
+
+  // Called from LanguageScreen when no tabs are found — clears the cached sheet
+  // ID so the next run picks up the user's actual file (or creates a fresh one).
+  function handleReconnectSheet() {
+    localStorage.removeItem('words_sheet_id')
+    setSheetId(null)
+    setSheetSearchKey(k => k + 1)
+  }
 
   // ── Words ──────────────────────────────────────────────────────────────────
   const { words, loading, saveSessionUpdates, setLearned, resetWord, reload } =
@@ -248,6 +259,7 @@ export default function App() {
             sheetId={sheetId}
             currentLang={currentLang}
             onSelect={handleLangSelect}
+            onReconnect={handleReconnectSheet}
           />
         }
       />

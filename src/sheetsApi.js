@@ -31,18 +31,30 @@ export async function findOrCreateWordsFile() {
   if (cached) return cached
 
   // Search for existing file
-  const query = encodeURIComponent(
-    `name='${DB_FILE_NAME}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`
-  )
-  const list = await request(`${DRIVE_BASE}/files?q=${query}&fields=files(id,name)`)
+  async function searchDrive() {
+    const query = encodeURIComponent(
+      `name='${DB_FILE_NAME}' and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`
+    )
+    const list = await request(`${DRIVE_BASE}/files?q=${query}&fields=files(id,name)`)
+    return list.files ?? []
+  }
 
-  if (list.files.length > 0) {
-    const id = list.files[0].id
+  let files = await searchDrive()
+
+  // Drive search can lag for recently-created files — retry once after a short delay
+  // before concluding no file exists and creating a new one.
+  if (files.length === 0) {
+    await new Promise(r => setTimeout(r, 2500))
+    files = await searchDrive()
+  }
+
+  if (files.length > 0) {
+    const id = files[0].id
     localStorage.setItem('words_sheet_id', id)
     return id
   }
 
-  // Create new spreadsheet
+  // No existing file found — create a new spreadsheet
   const created = await request(SHEETS_BASE, {
     method: 'POST',
     body: JSON.stringify({
