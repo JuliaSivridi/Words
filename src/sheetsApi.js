@@ -65,6 +65,25 @@ export async function findOrCreateWordsFile() {
   return created.spreadsheetId
 }
 
+// ─── Drive: list all Google Sheets owned by the user ────────────────────────
+
+export async function listUserSheets() {
+  const query = encodeURIComponent(
+    `mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`
+  )
+  const data = await request(
+    `${DRIVE_BASE}/files?q=${query}&fields=files(id,name)&orderBy=modifiedTime+desc`
+  )
+  return data.files ?? []
+}
+
+// ─── Drive: get display name of a specific file ──────────────────────────────
+
+export async function getSheetFileName(sheetId) {
+  const data = await request(`${DRIVE_BASE}/files/${sheetId}?fields=name`)
+  return data.name
+}
+
 // ─── Sheets: list language tabs ─────────────────────────────────────────────
 
 export async function getLanguageTabs(sheetId) {

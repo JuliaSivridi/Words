@@ -6,7 +6,7 @@ import {
   trySilentSignIn,
   onAuthChange,
 } from './auth.js'
-import { findOrCreateWordsFile, readSettings, writeSettings } from './sheetsApi.js'
+import { findOrCreateWordsFile, getSheetFileName, readSettings, writeSettings } from './sheetsApi.js'
 import { useWords } from './hooks/useWords.js'
 import { DEFAULT_SETTINGS } from './settingsUtils.js'
 
@@ -54,6 +54,9 @@ export default function App() {
   const [authReady, setAuthReady] = useState(false)
   const [user, setUser] = useState(null)
   const [sheetId, setSheetId] = useState(null)
+  const [sheetName, setSheetName] = useState(
+    () => localStorage.getItem('words_sheet_name') ?? null
+  )
   const [sheetSearchKey, setSheetSearchKey] = useState(0)
   const [currentLang, setCurrentLang] = useState(
     () => localStorage.getItem('words_lang') ?? null
@@ -82,6 +85,13 @@ export default function App() {
     findOrCreateWordsFile()
       .then(async id => {
         setSheetId(id)
+        // Fetch and cache the file display name (non-blocking)
+        getSheetFileName(id)
+          .then(name => {
+            setSheetName(name)
+            localStorage.setItem('words_sheet_name', name)
+          })
+          .catch(() => {})
         try {
           const settings = await readSettings(id)
           if (settings.language) {
@@ -113,6 +123,21 @@ export default function App() {
   function handleReconnectSheet() {
     localStorage.removeItem('words_sheet_id')
     setSheetId(null)
+    setSheetSearchKey(k => k + 1)
+  }
+
+  // Called from SettingsScreen when the user picks a different Google Sheet.
+  // Updates the cache and re-triggers the login useEffect so settings are
+  // read from the new file. Language / category are cleared since they belong
+  // to the previous sheet.
+  function handleSheetChange(newId, newName) {
+    localStorage.setItem('words_sheet_id', newId)
+    localStorage.setItem('words_sheet_name', newName)
+    setSheetName(newName)
+    setCurrentLang(null)
+    localStorage.removeItem('words_lang')
+    setSessionCategory(null)
+    saveCategoryToStorage(null)
     setSheetSearchKey(k => k + 1)
   }
 
@@ -217,6 +242,9 @@ export default function App() {
           <SettingsScreen
             settings={modeSettings}
             onChange={handleModeSettingsChange}
+            sheetId={sheetId}
+            sheetName={sheetName}
+            onChangeSheet={handleSheetChange}
           />
         }
       />

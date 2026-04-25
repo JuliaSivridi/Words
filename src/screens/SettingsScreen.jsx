@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Toast from '../components/Toast.jsx'
 import { DEFAULT_SETTINGS } from '../settingsUtils.js'
+import { listUserSheets } from '../sheetsApi.js'
 import styles from './SettingsScreen.module.css'
 
 const MODES = [
@@ -10,9 +11,36 @@ const MODES = [
   { key: 'mode3', maxKey: 'm3Max', label: 'Match',       description: 'Match 6 word–translation pairs' },
 ]
 
-export default function SettingsScreen({ settings, onChange }) {
+export default function SettingsScreen({ settings, onChange, sheetId, sheetName, onChangeSheet }) {
   const navigate = useNavigate()
   const [toast, setToast] = useState(null)
+
+  // ── Sheet picker ───────────────────────────────────────────────────────────
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [pickerFiles, setPickerFiles] = useState([])
+  const [pickerLoading, setPickerLoading] = useState(false)
+
+  async function handleOpenPicker() {
+    if (pickerOpen) { setPickerOpen(false); return }
+    setPickerOpen(true)
+    setPickerLoading(true)
+    try {
+      const files = await listUserSheets()
+      setPickerFiles(files)
+    } catch {
+      setToast('Could not load files')
+      setPickerOpen(false)
+    } finally {
+      setPickerLoading(false)
+    }
+  }
+
+  function handlePickFile(file) {
+    setPickerOpen(false)
+    if (file.id !== sheetId) {
+      onChangeSheet(file.id, file.name)
+    }
+  }
 
   // ── Checkbox toggle ────────────────────────────────────────────────────────
   function handleToggle(key) {
@@ -51,6 +79,46 @@ export default function SettingsScreen({ settings, onChange }) {
       </div>
 
       <div className={styles.content}>
+
+        {/* ── Spreadsheet ─────────────────────────────────────────────────── */}
+        <p className={styles.sectionLabel}>Spreadsheet</p>
+        <div className={styles.list}>
+          <div className={styles.row} style={{ cursor: 'default' }}>
+            <SheetIcon />
+            <div className={styles.rowText}>
+              <span className={styles.rowLabel}>{sheetName ?? 'db_words'}</span>
+              <span className={styles.rowDesc}>Google Sheets data source</span>
+            </div>
+            <button
+              className={styles.changeBtn}
+              onClick={handleOpenPicker}
+              aria-expanded={pickerOpen}
+            >
+              {pickerOpen ? 'Cancel' : 'Change'}
+            </button>
+          </div>
+
+          {pickerOpen && (
+            <div className={styles.pickerList}>
+              {pickerLoading && (
+                <div className={styles.pickerEmpty}>Loading your sheets…</div>
+              )}
+              {!pickerLoading && pickerFiles.length === 0 && (
+                <div className={styles.pickerEmpty}>No Google Sheets found in your Drive.</div>
+              )}
+              {!pickerLoading && pickerFiles.map(file => (
+                <button
+                  key={file.id}
+                  className={`${styles.pickerItem} ${file.id === sheetId ? styles.pickerItemActive : ''}`}
+                  onClick={() => handlePickFile(file)}
+                >
+                  <span className={styles.pickerItemName}>{file.name}</span>
+                  {file.id === sheetId && <CheckMark />}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* ── Session ─────────────────────────────────────────────────────── */}
         <p className={styles.sectionLabel}>Session</p>
@@ -123,6 +191,29 @@ function BackIcon() {
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
       stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="15 18 9 12 15 6" />
+    </svg>
+  )
+}
+
+function SheetIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      style={{ flexShrink: 0, color: 'var(--text-muted)' }}>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <line x1="3" y1="9" x2="21" y2="9" />
+      <line x1="3" y1="15" x2="21" y2="15" />
+      <line x1="9" y1="9" x2="9" y2="21" />
+    </svg>
+  )
+}
+
+function CheckMark() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+      style={{ flexShrink: 0, color: 'var(--accent)' }}>
+      <polyline points="20 6 9 17 4 12" />
     </svg>
   )
 }
