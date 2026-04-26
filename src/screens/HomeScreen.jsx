@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getUser, signOut } from '../auth.js'
 import { parseLangLabel } from '../langMap.js'
@@ -19,7 +20,27 @@ export default function HomeScreen({ sheetId, currentLang, currentCategory, onSi
       ? currentCategory[0]
       : `Multiple…`
 
+  // ── User menu ────────────────────────────────────────────────────────────────
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function handleClickOutside(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('touchstart', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('touchstart', handleClickOutside)
+    }
+  }, [menuOpen])
+
   function handleSignOut() {
+    setMenuOpen(false)
     signOut()
     onSignOut()
   }
@@ -32,13 +53,38 @@ export default function HomeScreen({ sheetId, currentLang, currentCategory, onSi
           <button className={styles.iconBtn} onClick={() => navigate('/settings')} title="Settings">
             <GearIcon />
           </button>
-          <button className={styles.userBtn} onClick={handleSignOut} title="Sign out">
-            {user?.picture ? (
-              <img src={user.picture} alt={user.name} className={styles.avatar} />
-            ) : (
-              <span className={styles.avatarFallback}>{user?.name?.[0] ?? '?'}</span>
+          <div className={styles.userMenuWrapper} ref={menuRef}>
+            <button
+              className={styles.userBtn}
+              onClick={() => setMenuOpen(o => !o)}
+              aria-expanded={menuOpen}
+              aria-haspopup="true"
+            >
+              {user?.picture ? (
+                <img src={user.picture} alt={user.name} className={styles.avatar} />
+              ) : (
+                <span className={styles.avatarFallback}>{user?.name?.[0] ?? '?'}</span>
+              )}
+            </button>
+
+            {menuOpen && (
+              <div className={styles.userMenu} role="menu">
+                <div className={styles.userMenuHeader}>
+                  <span className={styles.userMenuName}>{user?.name}</span>
+                  <span className={styles.userMenuEmail}>{user?.email}</span>
+                </div>
+                <div className={styles.userMenuDivider} />
+                <button
+                  className={styles.userMenuSignOut}
+                  onClick={handleSignOut}
+                  role="menuitem"
+                >
+                  <SignOutIcon />
+                  Sign out
+                </button>
+              </div>
             )}
-          </button>
+          </div>
         </div>
       </div>
 
@@ -150,6 +196,17 @@ function ListIcon() {
       <circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none" />
       <circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none" />
       <circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+function SignOutIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
     </svg>
   )
 }
