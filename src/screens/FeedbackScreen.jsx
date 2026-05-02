@@ -20,7 +20,6 @@ export default function FeedbackScreen() {
       await fetch(FEEDBACK_URL, {
         method: 'POST',
         mode: 'no-cors',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
           email: user?.email ?? '',
