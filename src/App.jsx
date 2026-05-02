@@ -17,6 +17,8 @@ import WordListScreen from './screens/WordListScreen.jsx'
 import LanguageScreen from './screens/LanguageScreen.jsx'
 import CategoryScreen from './screens/CategoryScreen.jsx'
 import SettingsScreen from './screens/SettingsScreen.jsx'
+import HelpScreen from './screens/HelpScreen.jsx'
+import FeedbackScreen from './screens/FeedbackScreen.jsx'
 
 // ── helpers: persist category as JSON in localStorage ─────────────────────
 function loadCategoryFromStorage() {
@@ -305,6 +307,8 @@ export default function App() {
           )
         }
       />
+      <Route path="/help" element={<HelpScreen />} />
+      <Route path="/feedback" element={<FeedbackScreen />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
