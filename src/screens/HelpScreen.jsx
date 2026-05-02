@@ -30,8 +30,8 @@ export default function HelpScreen() {
               </li>
               <li>
                 Your file needs at least one tab (sheet) named in the format{' '}
-                <strong>Language1-Language2</strong>, e.g. <strong>RU-EN</strong> or{' '}
-                <strong>FIN-EN</strong>.
+                <strong>Language1-Language2</strong>, e.g. <strong>EN-FI</strong> or{' '}
+                <strong>TUR-FIN</strong>.
               </li>
               <li><strong>Column A</strong> — category (optional grouping label, e.g. "verbs")</li>
               <li><strong>Column B</strong> — the word you are learning</li>
@@ -69,12 +69,12 @@ export default function HelpScreen() {
                 <tr>
                   <td><strong>Choice</strong></td>
                   <td>Pick the correct translation from 4 options</td>
-                  <td>4 flash-card reps</td>
+                  <td>After Flash-cards stage</td>
                 </tr>
                 <tr>
                   <td><strong>Match</strong></td>
                   <td>Connect 6 word–translation pairs on a grid</td>
-                  <td>8 choice reps</td>
+                  <td>After Choice stage</td>
                 </tr>
               </tbody>
             </table>
@@ -92,16 +92,16 @@ export default function HelpScreen() {
             <table className={styles.table}>
               <tbody>
                 <tr>
+                  <td className={styles.tdLabel}><strong>Start</strong></td>
+                  <td>Begin a practice session</td>
+                </tr>
+                <tr>
                   <td className={styles.tdLabel}><strong>Language</strong></td>
                   <td>Switch between tabs (sheets) in your spreadsheet file</td>
                 </tr>
                 <tr>
                   <td className={styles.tdLabel}><strong>Category</strong></td>
                   <td>Filter practice words by category (Column A)</td>
-                </tr>
-                <tr>
-                  <td className={styles.tdLabel}><strong>Start</strong></td>
-                  <td>Begin a practice session</td>
                 </tr>
                 <tr>
                   <td className={styles.tdLabel}><strong>Word list</strong></td>
