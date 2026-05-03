@@ -54,15 +54,95 @@ export async function findOrCreateWordsFile() {
     return id
   }
 
-  // No existing file found — create a new spreadsheet
+  // No existing file found — create a new spreadsheet with sample content
   const created = await request(SHEETS_BASE, {
     method: 'POST',
     body: JSON.stringify({
       properties: { title: DB_FILE_NAME },
+      sheets: [
+        { properties: { title: 'ENG-GER' } },
+        { properties: { title: '_settings' } },
+      ],
     }),
   })
+  await seedNewSpreadsheet(created.spreadsheetId)
   localStorage.setItem('words_sheet_id', created.spreadsheetId)
   return created.spreadsheetId
+}
+
+// ─── Seed data for a freshly-created spreadsheet ─────────────────────────────
+
+async function seedNewSpreadsheet(id) {
+  // Sample beginner German vocabulary — 3 categories × 10-12 words
+  // Column layout: A=category, B=word (German), C=translation (English)
+  const words = [
+    // ── Numbers ──────────────────────────────────────────────────────────────
+    ['Numbers', 'eins',    'one'],
+    ['Numbers', 'zwei',    'two'],
+    ['Numbers', 'drei',    'three'],
+    ['Numbers', 'vier',    'four'],
+    ['Numbers', 'fünf',    'five'],
+    ['Numbers', 'sechs',   'six'],
+    ['Numbers', 'sieben',  'seven'],
+    ['Numbers', 'acht',    'eight'],
+    ['Numbers', 'neun',    'nine'],
+    ['Numbers', 'zehn',    'ten'],
+    ['Numbers', 'elf',     'eleven'],
+    ['Numbers', 'zwölf',   'twelve'],
+    // ── Greetings ─────────────────────────────────────────────────────────────
+    ['Greetings', 'Hallo',           'Hello'],
+    ['Greetings', 'Guten Morgen',    'Good morning'],
+    ['Greetings', 'Guten Tag',       'Good day'],
+    ['Greetings', 'Guten Abend',     'Good evening'],
+    ['Greetings', 'Auf Wiedersehen', 'Goodbye'],
+    ['Greetings', 'Tschüss',         'Bye'],
+    ['Greetings', 'Bitte',           'Please'],
+    ['Greetings', 'Danke',           'Thank you'],
+    ['Greetings', 'Entschuldigung',  'Excuse me'],
+    ['Greetings', 'Ja',              'Yes'],
+    ['Greetings', 'Nein',            'No'],
+    // ── Colors ────────────────────────────────────────────────────────────────
+    ['Colors', 'rot',    'red'],
+    ['Colors', 'blau',   'blue'],
+    ['Colors', 'grün',   'green'],
+    ['Colors', 'gelb',   'yellow'],
+    ['Colors', 'schwarz','black'],
+    ['Colors', 'weiß',   'white'],
+    ['Colors', 'orange', 'orange'],
+    ['Colors', 'rosa',   'pink'],
+    ['Colors', 'lila',   'purple'],
+    ['Colors', 'braun',  'brown'],
+    ['Colors', 'grau',   'grey'],
+  ]
+
+  const settings = [
+    ['language',        'ENG-GER'],
+    ['category',        ''],
+    ['mode1',           'TRUE'],
+    ['mode2',           'TRUE'],
+    ['mode3',           'TRUE'],
+    ['stepsPerSession', '12'],
+    ['m1Max',           '4'],
+    ['m2Max',           '8'],
+    ['m3Max',           '12'],
+  ]
+
+  await request(`${SHEETS_BASE}/${id}/values:batchUpdate`, {
+    method: 'POST',
+    body: JSON.stringify({
+      valueInputOption: 'RAW',
+      data: [
+        {
+          range: `ENG-GER!A1:C${words.length + 1}`,
+          values: [['category', 'word', 'translation'], ...words],
+        },
+        {
+          range: '_settings!A1:B9',
+          values: settings,
+        },
+      ],
+    }),
+  })
 }
 
 // ─── Drive: list all Google Sheets owned by the user ────────────────────────
