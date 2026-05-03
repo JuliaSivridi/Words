@@ -60,7 +60,7 @@ export async function findOrCreateWordsFile() {
     body: JSON.stringify({
       properties: { title: DB_FILE_NAME },
       sheets: [
-        { properties: { title: 'ENG-GER' } },
+        { properties: { title: 'ENG-DEU' } },
         { properties: { title: '_settings' } },
       ],
     }),
@@ -116,7 +116,7 @@ async function seedNewSpreadsheet(id) {
   ]
 
   const settings = [
-    ['language',        'ENG-GER'],
+    ['language',        'ENG-DEU'],
     ['category',        ''],
     ['mode1',           'TRUE'],
     ['mode2',           'TRUE'],
@@ -133,7 +133,7 @@ async function seedNewSpreadsheet(id) {
       valueInputOption: 'RAW',
       data: [
         {
-          range: `ENG-GER!A1:C${words.length + 1}`,
+          range: `ENG-DEU!A1:C${words.length + 1}`,
           values: [['category', 'word', 'translation'], ...words],
         },
         {

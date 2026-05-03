@@ -40,7 +40,7 @@ export default function HelpScreen() {
             </ul>
             <div className={styles.note}>
               To practice in both directions, add a second tab with reversed languages,
-              e.g. <strong>EN-RU</strong>.
+              e.g. <strong>FI-EN</strong>.
             </div>
           </div>
         </section>
